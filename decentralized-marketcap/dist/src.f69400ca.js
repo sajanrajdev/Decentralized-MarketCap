@@ -98684,7 +98684,7 @@ var CoinTable = function (_a) {
           }, void 0), (0, _jsxRuntime.jsx)("td", {
             children: (0, _utils.currencyFormatter)(coin.derivedETH.valueOf() * etherPrice.valueOf(), currency)
           }, void 0), (0, _jsxRuntime.jsx)("td", {
-            children: coin.totalLiquidity.parseFloat()
+            children: coin.totalLiquidity
           }, void 0)]
         }, coin.id);
       })

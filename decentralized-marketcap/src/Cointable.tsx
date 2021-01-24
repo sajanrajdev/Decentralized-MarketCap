@@ -23,7 +23,7 @@ const CoinTable = ({coindata, currency, etherPrice}) => {
                 <td>{coin.name}</td>
                 <td>{coin.symbol}</td>
                 <td>{currencyFormatter(((coin.derivedETH.valueOf())*etherPrice.valueOf()), currency)}</td>
-                <td>{coin.totalLiquidity.parseFloat()}</td>
+                <td>{coin.totalLiquidity}</td>
                 </tr>
             ))}
             </tbody>
