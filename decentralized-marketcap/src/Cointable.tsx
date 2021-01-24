@@ -6,12 +6,12 @@ interface props {
     currency: string
 }
 
-const CoinTable = ({coindata, currency, etherPrice}) => {
+const CoinTable = ({coindata, currency}) => {
     return (
     <table className="table table-hover">
             <thead>
             <tr className="big-info">
-                <th>Coin</th>
+                <th>Token</th>
                 <th>Symbol</th>
                 <th>Price</th>
                 <th>Liquidity</th>
@@ -22,8 +22,8 @@ const CoinTable = ({coindata, currency, etherPrice}) => {
                 <tr key={coin.id}>
                 <td>{coin.name}</td>
                 <td>{coin.symbol}</td>
-                <td>{currencyFormatter(((coin.derivedETH.valueOf())*etherPrice.valueOf()), currency)}</td>
-                <td>{coin.totalLiquidity}</td>
+                <td>{currencyFormatter(coin.price, currency)}</td>
+                <td>{currencyFormatter(coin.totalLiquidity, currency)}</td>
                 </tr>
             ))}
             </tbody>

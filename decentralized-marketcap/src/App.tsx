@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, useQuery } from '@apollo/client';
-import gql from 'graphql-tag'
 import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, WETH } from '@uniswap/sdk'
 import CoinTable from './Cointable';
-
+import {ETHER_PRICE, ALL_TOKENS} from './queries'
 
 function App() {
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
-
-  var tokens = [];
+  const [sortedtokenslist, setSortedTokensList] = useState<any | any[]>([]);
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -20,46 +18,27 @@ function App() {
   const getEtherPrice = () => {
     client
     .query({
-      query: gql`{
-        bundle(id: "1" ) {
-          ethPrice
-        }
-       }
-      `
+      query: ETHER_PRICE
     })
-    .then(result => setEtherPrice(result.data.bundle.ethPrice));
+    .then(result => setEtherPrice(result.data.bundle.ethPrice.valueOf()));
     return(null);
   }
 
   const getAllTokens = () => {
     client
     .query({
-      query: gql`{
-        uniswapFactories(first: 5) {
-          id
-          pairCount
-          totalVolumeUSD
-        }
-        tokens(first: 100, orderBy: txCount, orderDirection: desc) {
-          id
-          symbol
-          name
-          decimals
-          totalSupply
-          tradeVolume
-          tradeVolumeUSD
-          untrackedVolumeUSD
-          txCount
-          totalLiquidity
-          derivedETH
-        }
-      }
-      
-      `
+      query: ALL_TOKENS
     })
     .then(result => setTokensList(result.data.tokens));
-    
     return(null);
+  }
+
+  const sortTokenList = (tokenslist: any[], ethPrice: number) => {
+    var copyOfItems = tokenslist.map(
+      token => ({...token, totalLiquidity: token.totalLiquidity.valueOf()*token.derivedETH.valueOf()*ethPrice, price: token.derivedETH.valueOf()*ethPrice})
+    ); // create a new array of items with totalLiquidity and Price added
+    copyOfItems = copyOfItems.sort((a,b) => a['totalLiquidity'] < b['totalLiquidity'] ? 1 : -1); //Sorts desc based on TotalLiquidity
+    return copyOfItems;
   }
 
 
@@ -79,12 +58,13 @@ function App() {
   useEffect(()=>{
     getEtherPrice();
     getAllTokens();
+    sortTokenList(tokenslist, etherPrice);
   }, []);
 
   console.log(tokenslist)
-/*   if(tokenslist[1] != undefined){    
-    getPrice(tokenslist[1].id, tokenslist[1].decimals);
-  } */
+  if(tokenslist[1] != undefined){    
+    console.log(sortTokenList(tokenslist, etherPrice));
+  }
 
   return (
   <ApolloProvider client={client}>
@@ -94,7 +74,7 @@ function App() {
           Uniswap Tokens
         </h1>
       </header>
-      <CoinTable coindata={tokenslist} currency={'USD'} etherPrice={etherPrice}/>
+      <CoinTable coindata={sortTokenList(tokenslist, etherPrice)} currency={'USD'}/>
     </div>
   </ApolloProvider>
   );

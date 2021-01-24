@@ -98655,8 +98655,7 @@ var __assign = void 0 && (void 0).__assign || function () {
 
 var CoinTable = function (_a) {
   var coindata = _a.coindata,
-      currency = _a.currency,
-      etherPrice = _a.etherPrice;
+      currency = _a.currency;
   return (0, _jsxRuntime.jsxs)("table", __assign({
     className: "table table-hover"
   }, {
@@ -98665,7 +98664,7 @@ var CoinTable = function (_a) {
         className: "big-info"
       }, {
         children: [(0, _jsxRuntime.jsx)("th", {
-          children: "Coin"
+          children: "Token"
         }, void 0), (0, _jsxRuntime.jsx)("th", {
           children: "Symbol"
         }, void 0), (0, _jsxRuntime.jsx)("th", {
@@ -98682,9 +98681,9 @@ var CoinTable = function (_a) {
           }, void 0), (0, _jsxRuntime.jsx)("td", {
             children: coin.symbol
           }, void 0), (0, _jsxRuntime.jsx)("td", {
-            children: (0, _utils.currencyFormatter)(coin.derivedETH.valueOf() * etherPrice.valueOf(), currency)
+            children: (0, _utils.currencyFormatter)(coin.price, currency)
           }, void 0), (0, _jsxRuntime.jsx)("td", {
-            children: coin.totalLiquidity
+            children: (0, _utils.currencyFormatter)(coin.totalLiquidity, currency)
           }, void 0)]
         }, coin.id);
       })
@@ -98694,7 +98693,36 @@ var CoinTable = function (_a) {
 
 var _default = CoinTable;
 exports.default = _default;
-},{"react/jsx-runtime":"../node_modules/react/jsx-runtime.js","react":"../node_modules/react/index.js","./utils":"utils.tsx"}],"App.tsx":[function(require,module,exports) {
+},{"react/jsx-runtime":"../node_modules/react/jsx-runtime.js","react":"../node_modules/react/index.js","./utils":"utils.tsx"}],"queries.tsx":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ALL_TOKENS = exports.ETHER_PRICE = void 0;
+
+var _graphqlTag = _interopRequireDefault(require("graphql-tag"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var __makeTemplateObject = void 0 && (void 0).__makeTemplateObject || function (cooked, raw) {
+  if (Object.defineProperty) {
+    Object.defineProperty(cooked, "raw", {
+      value: raw
+    });
+  } else {
+    cooked.raw = raw;
+  }
+
+  return cooked;
+};
+
+var ETHER_PRICE = (0, _graphqlTag.default)(templateObject_1 || (templateObject_1 = __makeTemplateObject(["{\n    bundle(id: \"1\" ) {\n      ethPrice\n    }\n   }\n"], ["{\n    bundle(id: \"1\" ) {\n      ethPrice\n    }\n   }\n"])));
+exports.ETHER_PRICE = ETHER_PRICE;
+var ALL_TOKENS = (0, _graphqlTag.default)(templateObject_2 || (templateObject_2 = __makeTemplateObject(["{\n    uniswapFactories(first: 5) {\n        id\n        pairCount\n        totalVolumeUSD\n    }\n    tokens(first: 100, orderBy: txCount, orderDirection: desc) {\n        id\n        symbol\n        name\n        decimals\n        totalSupply\n        tradeVolume\n        tradeVolumeUSD\n        untrackedVolumeUSD\n        txCount\n        totalLiquidity\n        derivedETH\n    }\n    }\n"], ["{\n    uniswapFactories(first: 5) {\n        id\n        pairCount\n        totalVolumeUSD\n    }\n    tokens(first: 100, orderBy: txCount, orderDirection: desc) {\n        id\n        symbol\n        name\n        decimals\n        totalSupply\n        tradeVolume\n        tradeVolumeUSD\n        untrackedVolumeUSD\n        txCount\n        totalLiquidity\n        derivedETH\n    }\n    }\n"])));
+exports.ALL_TOKENS = ALL_TOKENS;
+var templateObject_1, templateObject_2;
+},{"graphql-tag":"../node_modules/graphql-tag/src/index.js"}],"App.tsx":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -98710,29 +98738,17 @@ require("./App.css");
 
 var _client = require("@apollo/client");
 
-var _graphqlTag = _interopRequireDefault(require("graphql-tag"));
-
 var _sdk = require("@uniswap/sdk");
 
 var _Cointable = _interopRequireDefault(require("./Cointable"));
+
+var _queries = require("./queries");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-var __makeTemplateObject = void 0 && (void 0).__makeTemplateObject || function (cooked, raw) {
-  if (Object.defineProperty) {
-    Object.defineProperty(cooked, "raw", {
-      value: raw
-    });
-  } else {
-    cooked.raw = raw;
-  }
-
-  return cooked;
-};
 
 var __assign = void 0 && (void 0).__assign || function () {
   __assign = Object.assign || function (t) {
@@ -98900,7 +98916,10 @@ function App() {
       tokenslist = _b[0],
       setTokensList = _b[1];
 
-  var tokens = [];
+  var _c = (0, _react.useState)([]),
+      sortedtokenslist = _c[0],
+      setSortedTokensList = _c[1];
+
   var client = new _client.ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
     cache: new _client.InMemoryCache()
@@ -98908,20 +98927,35 @@ function App() {
 
   var getEtherPrice = function () {
     client.query({
-      query: (0, _graphqlTag.default)(templateObject_1 || (templateObject_1 = __makeTemplateObject(["{\n        bundle(id: \"1\" ) {\n          ethPrice\n        }\n       }\n      "], ["{\n        bundle(id: \"1\" ) {\n          ethPrice\n        }\n       }\n      "])))
+      query: _queries.ETHER_PRICE
     }).then(function (result) {
-      return setEtherPrice(result.data.bundle.ethPrice);
+      return setEtherPrice(result.data.bundle.ethPrice.valueOf());
     });
     return null;
   };
 
   var getAllTokens = function () {
     client.query({
-      query: (0, _graphqlTag.default)(templateObject_2 || (templateObject_2 = __makeTemplateObject(["{\n        uniswapFactories(first: 5) {\n          id\n          pairCount\n          totalVolumeUSD\n        }\n        tokens(first: 100, orderBy: txCount, orderDirection: desc) {\n          id\n          symbol\n          name\n          decimals\n          totalSupply\n          tradeVolume\n          tradeVolumeUSD\n          untrackedVolumeUSD\n          txCount\n          totalLiquidity\n          derivedETH\n        }\n      }\n      \n      "], ["{\n        uniswapFactories(first: 5) {\n          id\n          pairCount\n          totalVolumeUSD\n        }\n        tokens(first: 100, orderBy: txCount, orderDirection: desc) {\n          id\n          symbol\n          name\n          decimals\n          totalSupply\n          tradeVolume\n          tradeVolumeUSD\n          untrackedVolumeUSD\n          txCount\n          totalLiquidity\n          derivedETH\n        }\n      }\n      \n      "])))
+      query: _queries.ALL_TOKENS
     }).then(function (result) {
       return setTokensList(result.data.tokens);
     });
     return null;
+  };
+
+  var sortTokenList = function (tokenslist, ethPrice) {
+    var copyOfItems = tokenslist.map(function (token) {
+      return __assign(__assign({}, token), {
+        totalLiquidity: token.totalLiquidity.valueOf() * token.derivedETH.valueOf() * ethPrice,
+        price: token.derivedETH.valueOf() * ethPrice
+      });
+    }); // create a new array of items with totalLiquidity and Price added
+
+    copyOfItems = copyOfItems.sort(function (a, b) {
+      return a['totalLiquidity'] < b['totalLiquidity'] ? 1 : -1;
+    }); //Sorts desc based on TotalLiquidity
+
+    return copyOfItems;
   }; // Get price of token based on its pair value with ETH
 
 
@@ -98954,11 +98988,13 @@ function App() {
   (0, _react.useEffect)(function () {
     getEtherPrice();
     getAllTokens();
+    sortTokenList(tokenslist, etherPrice);
   }, []);
   console.log(tokenslist);
-  /*   if(tokenslist[1] != undefined){
-      getPrice(tokenslist[1].id, tokenslist[1].decimals);
-    } */
+
+  if (tokenslist[1] != undefined) {
+    console.log(sortTokenList(tokenslist, etherPrice));
+  }
 
   return (0, _jsxRuntime.jsx)(_client.ApolloProvider, __assign({
     client: client
@@ -98971,9 +99007,8 @@ function App() {
           children: "Uniswap Tokens"
         }, void 0)
       }, void 0), (0, _jsxRuntime.jsx)(_Cointable.default, {
-        coindata: tokenslist,
-        currency: 'USD',
-        etherPrice: etherPrice
+        coindata: sortTokenList(tokenslist, etherPrice),
+        currency: 'USD'
       }, void 0)]
     }), void 0)
   }), void 0);
@@ -98981,8 +99016,7 @@ function App() {
 
 var _default = App;
 exports.default = _default;
-var templateObject_1, templateObject_2;
-},{"react/jsx-runtime":"../node_modules/react/jsx-runtime.js","react":"../node_modules/react/index.js","./App.css":"App.css","@apollo/client":"../node_modules/@apollo/client/index.js","graphql-tag":"../node_modules/graphql-tag/src/index.js","@uniswap/sdk":"../node_modules/@uniswap/sdk/dist/sdk.esm.js","./Cointable":"Cointable.tsx"}],"index.tsx":[function(require,module,exports) {
+},{"react/jsx-runtime":"../node_modules/react/jsx-runtime.js","react":"../node_modules/react/index.js","./App.css":"App.css","@apollo/client":"../node_modules/@apollo/client/index.js","@uniswap/sdk":"../node_modules/@uniswap/sdk/dist/sdk.esm.js","./Cointable":"Cointable.tsx","./queries":"queries.tsx"}],"index.tsx":[function(require,module,exports) {
 "use strict";
 
 var _jsxRuntime = require("react/jsx-runtime");
