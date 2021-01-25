@@ -9,6 +9,7 @@ import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import ButtonAppBar from './AppBar'
 import { useWallet } from 'use-wallet'
 
@@ -104,13 +105,9 @@ function App() {
   const getPrice = async (id1: string, decimals1: number, id2: string, decimals2: number) => {
     const token1 = new Token(ChainId.MAINNET, id1, decimals1);
     const token2 = new Token(ChainId.MAINNET, id2, decimals2);
-    console.log("test")
     const pair = await Fetcher.fetchPairData(token1, token2);
-    console.log("test1")
     const route = new Route([pair], token1);
-    console.log("test2")
     const trade = new Trade(route, new TokenAmount(token1, '10000000000000000'), TradeType.EXACT_INPUT);
-    console.log("test3")
     console.log("Execution Price:", trade.executionPrice.toSignificant(6));
     console.log("Mid Price:", route.midPrice.toSignificant(6))
     return trade.executionPrice.toSignificant(6);
@@ -151,11 +148,12 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
-  const handleInputChange1 = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value)
     setInputToken1(event.target.value);
-    var ExecutionPrice = await getPrice(token1.address, token1.decimals, token2.address, token2.decimals);
-    setInputToken2((parseFloat(event.target.value)*parseFloat(ExecutionPrice)).toString());
+    if(event.target.value==''){
+      setInputToken2('');
+    }
   };
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken2(event.target.value);
@@ -163,6 +161,10 @@ function App() {
     settoken2({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
     setInputToken1('');
     setInputToken2('');
+  };
+  const handleEstimatePriceButton = async () => {
+    var ExecutionPrice = await getPrice(token1.address, token1.decimals, token2.address, token2.decimals);
+    setInputToken2((parseFloat(inputToken1)*parseFloat(ExecutionPrice)).toString());
   };
 
   return (
@@ -203,9 +205,14 @@ function App() {
         </form>
         <br/>
         <div>
-        <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||((parseFloat(wallet.balance)/1000000000000000000) < parseFloat(inputToken1))||(inputToken2=='')}>
-          Swap
-        </Button>
+        <ButtonGroup disableElevation variant="contained" color="primary">
+          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')} onClick={handleEstimatePriceButton}>
+            Estimate
+          </Button>
+          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||((parseFloat(wallet.balance)/1000000000000000000) < parseFloat(inputToken1))||(inputToken2=='')}>
+            Swap
+          </Button>
+        </ButtonGroup>
         </div>
         <br/>
 
