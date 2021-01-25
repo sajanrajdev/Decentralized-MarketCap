@@ -9,6 +9,8 @@ import Container from '@material-ui/core/Container';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
 
 interface TradeToken {
   name: string
@@ -21,8 +23,12 @@ function App() {
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key | React.Key[]>();
-  const [token1, settoken1] = useState<TradeToken>({name: "Select Token 1", symbol: "", address: "", decimals: 0});
-  const [token2, settoken2] = useState<TradeToken>({name: "Select Token 2", symbol: "", address: "", decimals: 0});
+  const [token1, settoken1] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
+  const [token2, settoken2] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
+  const [selectToken1, setSelectToken1] = useState('');
+  const [selectToken2, setSelectToken2] = useState('');
+  const [inputToken1, setInputToken1] = useState('');
+  const [inputToken2, setInputToken2] = useState('');
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -58,7 +64,13 @@ function App() {
     return sortedItems;
   }
 
-  const getTransactionTokens: React.FC = (tokenslist: any[], selectedKeys: React.Key[]) => {
+  const getTokensBySymbol = (tokenslist: any[], selectedSymbol: string) => {
+    var selectedToken = tokenslist.find(x => x.symbol === selectedSymbol)
+        console.log(selectedToken);
+      return (selectedToken);
+    }
+
+  const getTokensByID = (tokenslist: any[], selectedKeys: React.Key[]) => {
     var selectedTokens: any[] = []
     let i: number = 0
     if(selectedKeys){
@@ -71,68 +83,37 @@ function App() {
     }
   }
 
-  const TransactionForm = () => {
+  const HandleCheckBox = () => {
 
     if(selectedKeys){
 
-      var tokens = getTransactionTokens(tokenslist, selectedKeys);
+      var tokens = getTokensByID(tokenslist, selectedKeys);
 
       if(selectedKeys.length == 1){
-        token1.address = tokens[0].id;
-        token1.decimals = tokens[0].decimals
-        token1.name = tokens[0].name
-        token1.symbol = tokens[0].symbol 
+        setSelectToken1(tokens[0].symbol)
         console.log(token1)
       }
       else if(selectedKeys.length == 2){
-        token2.address = tokens[1].id;
-        token2.decimals = tokens[1].decimals
-        token2.name = tokens[1].name
-        token2.symbol = tokens[1].symbol 
+        setSelectToken2(tokens[1].symbol)
         console.log(token2)
       }
       else if(selectedKeys.length >= 2){
         console.log("Toom many selected")
       }
-      else{
-        token1.address = "";
-        token1.decimals = 0
-        token1.name = "Select Token 1"
-        token1.symbol = ""
-        token2.address = "";
-        token2.decimals = 0
-        token2.name = "Select Token 2"
-        token2.symbol = ""
-        console.log(token1)
-        console.log(token2)
-      }
     }
-
-    return(
-      <div>
-        <Container>
-          <List>
-            <ListItem>
-              <ListItemText primary={token1.name} secondary={token1.address}/>
-            </ListItem>
-            <ListItem>
-            <ListItemText primary={token2.name} secondary={token2.address}/>
-            </ListItem>
-          </List>
-        </Container>
-      </div>
-    ) 
+    return(null) 
   }
 
-
   // Get price of token based on its pair value with ETH
-  const getPrice = async (id: string, decimals: number) => {
-    const token = new Token(ChainId.MAINNET, id, decimals);
-    const weth = WETH[ChainId.MAINNET];
-    const pair = await Fetcher.fetchPairData(weth, token);
-    const route = new Route([pair], token);
-    const trade = new Trade(route, new TokenAmount(token, '100000000000000000'), TradeType.EXACT_INPUT);
-    console.log(trade.executionPrice.toSignificant(6));
+  const getPrice = async (id1: string, decimals1: number, id2: string, decimals2: number) => {
+    const token1 = new Token(ChainId.MAINNET, id1, decimals1);
+    const token2 = new Token(ChainId.MAINNET, id2, decimals2);
+    const pair = await Fetcher.fetchPairData(token1, token2);
+    const route = new Route([pair], token1);
+    const trade = new Trade(route, new TokenAmount(token1, '10000000000000000'), TradeType.EXACT_INPUT);
+    console.log("Execution Price:", trade.executionPrice.toSignificant(6));
+    console.log("Mid Price:", route.midPrice.toSignificant(6))
+    return trade.executionPrice.toSignificant(6);
   }
 
   // On Mount 
@@ -142,6 +123,23 @@ function App() {
     sortTokenList(tokenslist, etherPrice);
   }, []);
 
+  const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectToken1(event.target.value);
+    var token_temp = getTokensBySymbol(tokenslist, event.target.value);
+    settoken1({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
+  };
+  const handleInputChange1 = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value)
+    setInputToken1(event.target.value);
+    var ExecutionPrice = await getPrice(token1.address, token1.decimals, token2.address, token2.decimals);
+    setInputToken2((parseFloat(event.target.value)*parseFloat(ExecutionPrice)).toString());
+  };
+  const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectToken2(event.target.value);
+    var token_temp = getTokensBySymbol(tokenslist, event.target.value);
+    settoken2({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
+  };
+
   return (
     <div className="App">
       <header>
@@ -150,7 +148,34 @@ function App() {
         </h1>
       </header>
       <Container>
-        <TransactionForm></TransactionForm>
+        <HandleCheckBox></HandleCheckBox>
+
+        <form className="form">
+          <div>
+            <TextField id="Select1" select label="Select" value={selectToken1} onChange={handleChange1} helperText="Please select your token 1" variant="outlined">
+              {tokenslist.map((option) => (
+                <MenuItem key={option.id} value={option.symbol}>
+                  {option.symbol}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')}
+            />
+          </div>
+          <br/>
+          <div>
+            <TextField id="Select2" select label="Select" value={selectToken2} onChange={handleChange2} helperText="Please select your token 2" variant="outlined">
+              {tokenslist.map((option) => (
+                <MenuItem key={option.id} value={option.symbol}>
+                  {option.symbol}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} color="primary" disabled/>
+          </div>
+        </form>
+        <br/>
+
         <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={selectedRowsKeys => setSelectedKeys(selectedRowsKeys)}/>
       </Container>
     </div>
