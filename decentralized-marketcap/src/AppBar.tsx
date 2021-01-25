@@ -42,7 +42,6 @@ export default function ButtonAppBar() {
           <Button color="primary" variant="contained" onClick={ () => {
               if(buttonstatus == 'Connect Wallet'){
                 wallet.connect('injected');
-                console.log(wallet.account)
                 setButtonStatus('Disconnect Wallet');
               }
               else{

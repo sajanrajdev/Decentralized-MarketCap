@@ -61,7 +61,6 @@
         selectedTokens[i] = tokenslist.find(x => x.id === element)
         i++;
       });
-      console.log(selectedTokens);
       return (selectedTokens);
     }
   }

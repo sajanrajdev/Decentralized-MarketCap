@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import { ApolloClient, InMemoryCache} from '@apollo/client';
-import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, WETH } from '@uniswap/sdk'
+import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
-import {ETHER_PRICE, ALL_TOKENS} from './queries'
-import {currencyFormatter, sortTokenList, getTokenBySymbol, getTokensByID} from './utils';
-import {Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch} from '@material-ui/core';
+import { ETHER_PRICE, ALL_TOKENS } from './queries'
+import { sortTokenList, getTokenBySymbol, getTokensByID } from './utils';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
-import {ThemeProvider, createMuiTheme} from '@material-ui/core/styles';
-import purple from '@material-ui/core/colors/purple';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { useWallet } from 'use-wallet'
 
 interface TradeToken {
@@ -32,7 +31,7 @@ function App() {
 
   const wallet = useWallet();
 
-  const theme = createMuiTheme({
+  const mainTheme = createMuiTheme({
     palette:{
       type: darkmode ? "dark" : "light",
       primary: {
@@ -66,36 +65,6 @@ function App() {
     .then(result => setTokensList(result.data.tokens));
     return(null);
   }
-
-/*   const sortTokenList = (tokenslist: any[], ethPrice: number) => {
-    var sortedItems = tokenslist.map(
-      token => ({...token, totalLiquidity: token.totalLiquidity.valueOf()*token.derivedETH.valueOf()*ethPrice, price: token.derivedETH.valueOf()*ethPrice})
-    ); // create a new array of items with totalLiquidity and Price added
-    sortedItems = sortedItems.sort((a,b) => a['totalLiquidity'] < b['totalLiquidity'] ? 1 : -1); //Sorts desc based on TotalLiquidity
-    sortedItems = sortedItems.map(
-      token => ({...token, totalLiquidity: currencyFormatter(token.totalLiquidity, 'usd'), price: currencyFormatter(token.price, 'usd')})
-    ); // Format total liquidity and price to USD
-    return sortedItems;
-  }
-
-  const getTokenBySymbol = (tokenslist: any[], selectedSymbol: string) => {
-    var selectedToken = tokenslist.find(x => x.symbol === selectedSymbol)
-        console.log(selectedToken);
-      return (selectedToken);
-    }
-
-  const getTokensByID = (tokenslist: any[], selectedKeys: any[] | any) => {
-    var selectedTokens: any[] = []
-    let i: number = 0
-    if(selectedKeys){
-      selectedKeys.forEach((element: any[] | any) => {
-        selectedTokens[i] = tokenslist.find(x => x.id === element)
-        i++;
-      });
-      console.log(selectedTokens);
-      return (selectedTokens);
-    }
-  } */
 
   const HandleCheckBox = () => {
     if(selectedKeys){
@@ -189,7 +158,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={mainTheme}>
       <Paper>
     <div className="App">
       <ButtonAppBar></ButtonAppBar>
