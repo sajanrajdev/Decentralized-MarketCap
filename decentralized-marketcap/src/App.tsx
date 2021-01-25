@@ -4,13 +4,11 @@ import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, WETH } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import {ETHER_PRICE, ALL_TOKENS} from './queries'
-import {currencyFormatter} from './utils';
-import Container from '@material-ui/core/Container';
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
-import ButtonGroup from '@material-ui/core/ButtonGroup';
+import {currencyFormatter, sortTokenList, getTokenBySymbol, getTokensByID} from './utils';
+import {Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch} from '@material-ui/core';
 import ButtonAppBar from './AppBar'
+import {ThemeProvider, createMuiTheme} from '@material-ui/core/styles';
+import purple from '@material-ui/core/colors/purple';
 import { useWallet } from 'use-wallet'
 
 interface TradeToken {
@@ -30,8 +28,21 @@ function App() {
   const [selectToken2, setSelectToken2] = useState('');
   const [inputToken1, setInputToken1] = useState('');
   const [inputToken2, setInputToken2] = useState('');
+  const [darkmode, setDarkMode] = useState<boolean>(true);
 
   const wallet = useWallet();
+
+  const theme = createMuiTheme({
+    palette:{
+      type: darkmode ? "dark" : "light",
+      primary: {
+        main: '#F4157D',
+      },
+      secondary: {
+        main: '#00695f'
+      }
+    }
+  });
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -56,7 +67,7 @@ function App() {
     return(null);
   }
 
-  const sortTokenList = (tokenslist: any[], ethPrice: number) => {
+/*   const sortTokenList = (tokenslist: any[], ethPrice: number) => {
     var sortedItems = tokenslist.map(
       token => ({...token, totalLiquidity: token.totalLiquidity.valueOf()*token.derivedETH.valueOf()*ethPrice, price: token.derivedETH.valueOf()*ethPrice})
     ); // create a new array of items with totalLiquidity and Price added
@@ -84,7 +95,7 @@ function App() {
       console.log(selectedTokens);
       return (selectedTokens);
     }
-  }
+  } */
 
   const HandleCheckBox = () => {
     if(selectedKeys){
@@ -178,6 +189,8 @@ function App() {
   };
 
   return (
+    <ThemeProvider theme={theme}>
+      <Paper>
     <div className="App">
       <ButtonAppBar></ButtonAppBar>
       <header>
@@ -228,7 +241,10 @@ function App() {
 
         <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={(selectedRowsKeys: string|string[]) => setSelectedKeys(selectedRowsKeys)}/>
       </Container>
+      <Switch color="secondary" onChange={() => setDarkMode(!darkmode)}></Switch>
     </div>
+    </Paper>
+    </ThemeProvider>
   );
 }
 
