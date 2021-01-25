@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, useQuery } from '@apollo/client';
+import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, WETH } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import {ETHER_PRICE, ALL_TOKENS} from './queries'
 import {currencyFormatter} from './utils';
 import Container from '@material-ui/core/Container';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
+import Button from '@material-ui/core/Button';
+import ButtonAppBar from './AppBar'
+import { useWallet } from 'use-wallet'
 
 interface TradeToken {
   name: string
@@ -29,6 +29,9 @@ function App() {
   const [selectToken2, setSelectToken2] = useState('');
   const [inputToken1, setInputToken1] = useState('');
   const [inputToken2, setInputToken2] = useState('');
+
+  const wallet = useWallet();
+  const blockNumber = wallet.getBlockNumber();
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -84,11 +87,8 @@ function App() {
   }
 
   const HandleCheckBox = () => {
-
     if(selectedKeys){
-
       var tokens = getTokensByID(tokenslist, selectedKeys);
-
       if(selectedKeys.length == 1){
         setSelectToken1(tokens[0].symbol)
         console.log(token1)
@@ -127,6 +127,8 @@ function App() {
     setSelectToken1(event.target.value);
     var token_temp = getTokensBySymbol(tokenslist, event.target.value);
     settoken1({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
+    setInputToken1('');
+    setInputToken2('');
   };
   const handleInputChange1 = async (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value)
@@ -138,18 +140,36 @@ function App() {
     setSelectToken2(event.target.value);
     var token_temp = getTokensBySymbol(tokenslist, event.target.value);
     settoken2({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
+    setInputToken1('');
+    setInputToken2('');
   };
 
   return (
     <div className="App">
+      <ButtonAppBar></ButtonAppBar>
       <header>
         <h1>
           Uniswap Remote Trader
         </h1>
       </header>
+
+      {wallet.status === 'connected' ? (
+        <div>
+          <Button variant="outlined" size="large" color="primary">
+            <div>Balance: {(parseFloat(wallet.balance)/1000000000000000000)} ETH</div>
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <Button variant="outlined" size="large" color="primary">
+            <div>Balance: Disconnected</div>
+          </Button>
+        </div>
+      )}
+      <br/>
+
       <Container>
         <HandleCheckBox></HandleCheckBox>
-
         <form className="form">
           <div>
             <TextField id="Select1" select label="Select" value={selectToken1} onChange={handleChange1} helperText="Please select your token 1" variant="outlined">
@@ -159,8 +179,7 @@ function App() {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')}
-            />
+            <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
           </div>
           <br/>
           <div>
@@ -171,9 +190,15 @@ function App() {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} color="primary" disabled/>
+            <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} color="primary" disabled type="number"/>
           </div>
         </form>
+        <br/>
+        <div>
+        <Button variant="contained" size="large" color="primary">
+          Swap
+        </Button>
+        </div>
         <br/>
 
         <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={selectedRowsKeys => setSelectedKeys(selectedRowsKeys)}/>
