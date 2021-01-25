@@ -3,11 +3,6 @@ import {percentageFormatter, currencyFormatter, capitalize} from './utils';
 import { DataGrid } from '@material-ui/data-grid';
 import { Container, Hidden } from '@material-ui/core';
 
-/* interface props {
-    coindata: any[]
-    currency: string
-} */
-
   const columns = [
     { field: 'name', headerName: 'Token', flex: 303, sortable: false},
     { field: 'symbol', headerName: 'Symbol', flex: 303, sortable: false},

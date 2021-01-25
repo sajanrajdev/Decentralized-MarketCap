@@ -6,12 +6,23 @@ import Tokentable from './Tokentable';
 import {ETHER_PRICE, ALL_TOKENS} from './queries'
 import {currencyFormatter} from './utils';
 import Container from '@material-ui/core/Container';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+
+interface TradeToken {
+  name: string
+  symbol: string
+  address: string
+  decimals: number
+}
 
 function App() {
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
-  const [sortedtokenslist, setSortedTokensList] = useState<any | any[]>([]);
   const [selectedKeys, setSelectedKeys] = useState<React.Key | React.Key[]>();
+  const [token1, settoken1] = useState<TradeToken>({name: "Select Token 1", symbol: "", address: "", decimals: 0});
+  const [token2, settoken2] = useState<TradeToken>({name: "Select Token 2", symbol: "", address: "", decimals: 0});
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -48,34 +59,69 @@ function App() {
   }
 
   const getTransactionTokens: React.FC = (tokenslist: any[], selectedKeys: React.Key[]) => {
-    var tokenNames: any[] = []
+    var selectedTokens: any[] = []
     let i: number = 0
     if(selectedKeys){
       selectedKeys.forEach(element => {
-        tokenNames[i] = tokenslist.find(x => x.id === element)
+        selectedTokens[i] = tokenslist.find(x => x.id === element)
         i++;
-        console.log(tokenNames);
+        console.log(selectedTokens);
       });
-      return (tokenNames[0]);
+      return (selectedTokens);
     }
   }
 
   const TransactionForm = () => {
+
     if(selectedKeys){
-      return(
-        <div>
-          <form>
-            <input placeholder={getTransactionTokens(tokenslist, selectedKeys).name}>
-              
-            </input>
-          </form>
-        </div>
-      )
+
+      var tokens = getTransactionTokens(tokenslist, selectedKeys);
+
+      if(selectedKeys.length == 1){
+        token1.address = tokens[0].id;
+        token1.decimals = tokens[0].decimals
+        token1.name = tokens[0].name
+        token1.symbol = tokens[0].symbol 
+        console.log(token1)
+      }
+      else if(selectedKeys.length == 2){
+        token2.address = tokens[1].id;
+        token2.decimals = tokens[1].decimals
+        token2.name = tokens[1].name
+        token2.symbol = tokens[1].symbol 
+        console.log(token2)
+      }
+      else if(selectedKeys.length >= 2){
+        console.log("Toom many selected")
+      }
+      else{
+        token1.address = "";
+        token1.decimals = 0
+        token1.name = "Select Token 1"
+        token1.symbol = ""
+        token2.address = "";
+        token2.decimals = 0
+        token2.name = "Select Token 2"
+        token2.symbol = ""
+        console.log(token1)
+        console.log(token2)
+      }
     }
-    else{
-      return null;
-    }
-    
+
+    return(
+      <div>
+        <Container>
+          <List>
+            <ListItem>
+              <ListItemText primary={token1.name} secondary={token1.address}/>
+            </ListItem>
+            <ListItem>
+            <ListItemText primary={token2.name} secondary={token2.address}/>
+            </ListItem>
+          </List>
+        </Container>
+      </div>
+    ) 
   }
 
 
