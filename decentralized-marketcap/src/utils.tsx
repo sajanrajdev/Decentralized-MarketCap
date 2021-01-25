@@ -22,5 +22,15 @@
      return "N/A";
    }
   }
+  // Function to truncate a string to a certain length
+  const truncateString = (str: string | null, num: number) => {
+    if(str == null){
+        return null
+    }
+    if (str.length <= num) {
+        return str
+    }
+    return str.slice(0, num) + '...'
+  }
 
-  export {percentageFormatter, currencyFormatter, capitalize}
+  export {percentageFormatter, currencyFormatter, capitalize, truncateString}

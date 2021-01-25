@@ -22,7 +22,7 @@ interface TradeToken {
 function App() {
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
-  const [selectedKeys, setSelectedKeys] = useState<React.Key | React.Key[]>();
+  const [selectedKeys, setSelectedKeys] = useState<string>();
   const [token1, settoken1] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [token2, settoken2] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [selectToken1, setSelectToken1] = useState('');
@@ -31,7 +31,6 @@ function App() {
   const [inputToken2, setInputToken2] = useState('');
 
   const wallet = useWallet();
-  const blockNumber = wallet.getBlockNumber();
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -67,20 +66,19 @@ function App() {
     return sortedItems;
   }
 
-  const getTokensBySymbol = (tokenslist: any[], selectedSymbol: string) => {
+  const getTokenBySymbol = (tokenslist: any[], selectedSymbol: string) => {
     var selectedToken = tokenslist.find(x => x.symbol === selectedSymbol)
         console.log(selectedToken);
       return (selectedToken);
     }
 
-  const getTokensByID = (tokenslist: any[], selectedKeys: React.Key[]) => {
+  const getTokensByID = (tokenslist: any[], selectedKeys: React.Key[] | React.Key) => {
     var selectedTokens: any[] = []
     let i: number = 0
     if(selectedKeys){
       selectedKeys.forEach(element => {
         selectedTokens[i] = tokenslist.find(x => x.id === element)
         i++;
-        console.log(selectedTokens);
       });
       return (selectedTokens);
     }
@@ -88,14 +86,12 @@ function App() {
 
   const HandleCheckBox = () => {
     if(selectedKeys){
-      var tokens = getTokensByID(tokenslist, selectedKeys);
+      var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
       if(selectedKeys.length == 1){
         setSelectToken1(tokens[0].symbol)
-        console.log(token1)
       }
       else if(selectedKeys.length == 2){
         setSelectToken2(tokens[1].symbol)
-        console.log(token2)
       }
       else if(selectedKeys.length >= 2){
         console.log("Toom many selected")
@@ -104,16 +100,41 @@ function App() {
     return(null) 
   }
 
-  // Get price of token based on its pair value with ETH
+  // Get realtime price of token1 based on paired token2
   const getPrice = async (id1: string, decimals1: number, id2: string, decimals2: number) => {
     const token1 = new Token(ChainId.MAINNET, id1, decimals1);
     const token2 = new Token(ChainId.MAINNET, id2, decimals2);
+    console.log("test")
     const pair = await Fetcher.fetchPairData(token1, token2);
+    console.log("test1")
     const route = new Route([pair], token1);
+    console.log("test2")
     const trade = new Trade(route, new TokenAmount(token1, '10000000000000000'), TradeType.EXACT_INPUT);
+    console.log("test3")
     console.log("Execution Price:", trade.executionPrice.toSignificant(6));
     console.log("Mid Price:", route.midPrice.toSignificant(6))
     return trade.executionPrice.toSignificant(6);
+  }
+
+  const BalanceButton = () => {
+    return(
+      <div>
+      {wallet.status === 'connected' ? (
+        <div>
+          <Button variant="outlined" size="large" color="primary">
+            <div>Balance: {(parseFloat(wallet.balance)/1000000000000000000)} ETH</div>
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <Button variant="outlined" size="large" color="primary" disabled>
+            <div>Balance: Disconnected</div>
+          </Button>
+        </div>
+      )}
+      <br/>
+      </div>
+    )
   }
 
   // On Mount 
@@ -125,7 +146,7 @@ function App() {
 
   const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken1(event.target.value);
-    var token_temp = getTokensBySymbol(tokenslist, event.target.value);
+    var token_temp = getTokenBySymbol(tokenslist, event.target.value);
     settoken1({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
     setInputToken1('');
     setInputToken2('');
@@ -138,7 +159,7 @@ function App() {
   };
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken2(event.target.value);
-    var token_temp = getTokensBySymbol(tokenslist, event.target.value);
+    var token_temp = getTokenBySymbol(tokenslist, event.target.value);
     settoken2({name: token_temp.name, symbol: token_temp.symbol, address: token_temp.id, decimals: token_temp.decimals});
     setInputToken1('');
     setInputToken2('');
@@ -153,27 +174,14 @@ function App() {
         </h1>
       </header>
 
-      {wallet.status === 'connected' ? (
-        <div>
-          <Button variant="outlined" size="large" color="primary">
-            <div>Balance: {(parseFloat(wallet.balance)/1000000000000000000)} ETH</div>
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <Button variant="outlined" size="large" color="primary">
-            <div>Balance: Disconnected</div>
-          </Button>
-        </div>
-      )}
-      <br/>
+      <BalanceButton></BalanceButton>
 
       <Container>
         <HandleCheckBox></HandleCheckBox>
         <form className="form">
           <div>
             <TextField id="Select1" select label="Select" value={selectToken1} onChange={handleChange1} helperText="Please select your token 1" variant="outlined">
-              {tokenslist.map((option) => (
+              {tokenslist.map((option: any | any[]) => (
                 <MenuItem key={option.id} value={option.symbol}>
                   {option.symbol}
                 </MenuItem>
@@ -184,7 +192,7 @@ function App() {
           <br/>
           <div>
             <TextField id="Select2" select label="Select" value={selectToken2} onChange={handleChange2} helperText="Please select your token 2" variant="outlined">
-              {tokenslist.map((option) => (
+              {tokenslist.map((option: any | any[]) => (
                 <MenuItem key={option.id} value={option.symbol}>
                   {option.symbol}
                 </MenuItem>
@@ -195,13 +203,13 @@ function App() {
         </form>
         <br/>
         <div>
-        <Button variant="contained" size="large" color="primary">
+        <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||((parseFloat(wallet.balance)/1000000000000000000) < parseFloat(inputToken1))||(inputToken2=='')}>
           Swap
         </Button>
         </div>
         <br/>
 
-        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={selectedRowsKeys => setSelectedKeys(selectedRowsKeys)}/>
+        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={(selectedRowsKeys: string) => setSelectedKeys(selectedRowsKeys)}/>
       </Container>
     </div>
   );

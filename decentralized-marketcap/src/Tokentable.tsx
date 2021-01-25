@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {percentageFormatter, currencyFormatter, capitalize} from './utils';
+import React, { useState } from "react";
 import { DataGrid } from '@material-ui/data-grid';
-import { Container, Hidden } from '@material-ui/core';
 
   const columns = [
     { field: 'name', headerName: 'Token', flex: 303, sortable: false},
