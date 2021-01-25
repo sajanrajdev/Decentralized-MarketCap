@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../node_modules/stream-http/lib/capability.js":[function(require,module,exports) {
+})({"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/capability.js":[function(require,module,exports) {
 var global = arguments[3];
 exports.fetch = isFunction(global.fetch) && isFunction(global.ReadableStream)
 
@@ -193,7 +193,7 @@ function isFunction (value) {
 
 xhr = null // Help gc
 
-},{}],"../node_modules/stream-http/lib/response.js":[function(require,module,exports) {
+},{}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/response.js":[function(require,module,exports) {
 var process = require("process");
 var Buffer = require("buffer").Buffer;
 var global = arguments[3];
@@ -422,7 +422,7 @@ IncomingMessage.prototype._onXHRProgress = function () {
 	}
 }
 
-},{"./capability":"../node_modules/stream-http/lib/capability.js","inherits":"../node_modules/inherits/inherits_browser.js","readable-stream":"../node_modules/readable-stream/readable-browser.js","process":"../node_modules/process/browser.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js"}],"../node_modules/to-arraybuffer/index.js":[function(require,module,exports) {
+},{"./capability":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/capability.js","inherits":"../../../../../AppData/Local/Yarn/Data/global/node_modules/inherits/inherits_browser.js","readable-stream":"../../../../../AppData/Local/Yarn/Data/global/node_modules/readable-stream/readable-browser.js","process":"../../../../../AppData/Local/Yarn/Data/global/node_modules/process/browser.js","buffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/buffer/index.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/to-arraybuffer/index.js":[function(require,module,exports) {
 
 var Buffer = require('buffer').Buffer
 
@@ -452,7 +452,7 @@ module.exports = function (buf) {
 	}
 }
 
-},{"buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js"}],"../node_modules/stream-http/lib/request.js":[function(require,module,exports) {
+},{"buffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/buffer/index.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/request.js":[function(require,module,exports) {
 var Buffer = require("buffer").Buffer;
 var global = arguments[3];
 var process = require("process");
@@ -784,7 +784,7 @@ var unsafeHeaders = [
 	'via'
 ]
 
-},{"./capability":"../node_modules/stream-http/lib/capability.js","inherits":"../node_modules/inherits/inherits_browser.js","./response":"../node_modules/stream-http/lib/response.js","readable-stream":"../node_modules/readable-stream/readable-browser.js","to-arraybuffer":"../node_modules/to-arraybuffer/index.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js","process":"../node_modules/process/browser.js"}],"../node_modules/xtend/immutable.js":[function(require,module,exports) {
+},{"./capability":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/capability.js","inherits":"../../../../../AppData/Local/Yarn/Data/global/node_modules/inherits/inherits_browser.js","./response":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/response.js","readable-stream":"../../../../../AppData/Local/Yarn/Data/global/node_modules/readable-stream/readable-browser.js","to-arraybuffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/to-arraybuffer/index.js","buffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/buffer/index.js","process":"../../../../../AppData/Local/Yarn/Data/global/node_modules/process/browser.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/xtend/immutable.js":[function(require,module,exports) {
 module.exports = extend;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -803,7 +803,7 @@ function extend() {
 
   return target;
 }
-},{}],"../node_modules/builtin-status-codes/browser.js":[function(require,module,exports) {
+},{}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/builtin-status-codes/browser.js":[function(require,module,exports) {
 module.exports = {
   "100": "Continue",
   "101": "Switching Protocols",
@@ -869,7 +869,7 @@ module.exports = {
   "511": "Network Authentication Required"
 }
 
-},{}],"../node_modules/stream-http/index.js":[function(require,module,exports) {
+},{}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/index.js":[function(require,module,exports) {
 var global = arguments[3];
 var ClientRequest = require('./lib/request')
 var response = require('./lib/response')
@@ -956,7 +956,7 @@ http.METHODS = [
 	'UNLOCK',
 	'UNSUBSCRIBE'
 ]
-},{"./lib/request":"../node_modules/stream-http/lib/request.js","./lib/response":"../node_modules/stream-http/lib/response.js","xtend":"../node_modules/xtend/immutable.js","builtin-status-codes":"../node_modules/builtin-status-codes/browser.js","url":"../node_modules/url/url.js"}],"../node_modules/https-browserify/index.js":[function(require,module,exports) {
+},{"./lib/request":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/request.js","./lib/response":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/lib/response.js","xtend":"../../../../../AppData/Local/Yarn/Data/global/node_modules/xtend/immutable.js","builtin-status-codes":"../../../../../AppData/Local/Yarn/Data/global/node_modules/builtin-status-codes/browser.js","url":"../../../../../AppData/Local/Yarn/Data/global/node_modules/url/url.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/https-browserify/index.js":[function(require,module,exports) {
 var http = require('http')
 var url = require('url')
 
@@ -989,7 +989,7 @@ function validateParams (params) {
   return params
 }
 
-},{"http":"../node_modules/stream-http/index.js","url":"../node_modules/url/url.js"}],"../node_modules/os-browserify/browser.js":[function(require,module,exports) {
+},{"http":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/index.js","url":"../../../../../AppData/Local/Yarn/Data/global/node_modules/url/url.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/os-browserify/browser.js":[function(require,module,exports) {
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -21258,7 +21258,7 @@ var Hm = class extends Pp {
 exports.__moduleExports = zm;
 var _default = Gm;
 exports.default = _default;
-},{"./index-d3bd4678.js":"../node_modules/use-wallet/dist/index-d3bd4678.js","react":"../node_modules/react/index.js","@aragon/provided-connector":"../node_modules/@aragon/provided-connector/dist/provided-connector.esm.js","events":"../node_modules/events/events.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js","./_crypto_commonjs-external-1a228943.js":"../node_modules/use-wallet/dist/_crypto_commonjs-external-1a228943.js","stream":"../node_modules/stream-browserify/index.js","string_decoder":"../node_modules/node-libs-browser/node_modules/string_decoder/lib/string_decoder.js","./_util_commonjs-external-6c254708.js":"../node_modules/use-wallet/dist/_util_commonjs-external-6c254708.js","crypto":"../node_modules/crypto-browserify/index.js","assert":"../node_modules/assert/assert.js","util":"../node_modules/util/util.js","url":"../node_modules/url/url.js","./_url_commonjs-external-af75b180.js":"../node_modules/use-wallet/dist/_url_commonjs-external-af75b180.js","http":"../node_modules/stream-http/index.js","https":"../node_modules/https-browserify/index.js","os":"../node_modules/os-browserify/browser.js","process":"../node_modules/process/browser.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./index-d3bd4678.js":"../node_modules/use-wallet/dist/index-d3bd4678.js","react":"../node_modules/react/index.js","@aragon/provided-connector":"../node_modules/@aragon/provided-connector/dist/provided-connector.esm.js","events":"../../../../../AppData/Local/Yarn/Data/global/node_modules/events/events.js","buffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/buffer/index.js","./_crypto_commonjs-external-1a228943.js":"../node_modules/use-wallet/dist/_crypto_commonjs-external-1a228943.js","stream":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-browserify/index.js","string_decoder":"../../../../../AppData/Local/Yarn/Data/global/node_modules/node-libs-browser/node_modules/string_decoder/lib/string_decoder.js","./_util_commonjs-external-6c254708.js":"../node_modules/use-wallet/dist/_util_commonjs-external-6c254708.js","crypto":"../../../../../AppData/Local/Yarn/Data/global/node_modules/crypto-browserify/index.js","assert":"../../../../../AppData/Local/Yarn/Data/global/node_modules/assert/assert.js","util":"../../../../../AppData/Local/Yarn/Data/global/node_modules/util/util.js","url":"../../../../../AppData/Local/Yarn/Data/global/node_modules/url/url.js","./_url_commonjs-external-af75b180.js":"../node_modules/use-wallet/dist/_url_commonjs-external-af75b180.js","http":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-http/index.js","https":"../../../../../AppData/Local/Yarn/Data/global/node_modules/https-browserify/index.js","os":"../../../../../AppData/Local/Yarn/Data/global/node_modules/os-browserify/browser.js","process":"../../../../../AppData/Local/Yarn/Data/global/node_modules/process/browser.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -21286,7 +21286,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58677" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64623" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -21462,5 +21462,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
+},{}]},{},["../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
 //# sourceMappingURL=/index-1d2649b8.fd76b932.js.map

@@ -23,7 +23,7 @@ interface TradeToken {
 function App() {
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
-  const [selectedKeys, setSelectedKeys] = useState<string>();
+  const [selectedKeys, setSelectedKeys] = useState<any[] | any>([]);
   const [token1, settoken1] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [token2, settoken2] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [selectToken1, setSelectToken1] = useState('');
@@ -73,14 +73,15 @@ function App() {
       return (selectedToken);
     }
 
-  const getTokensByID = (tokenslist: any[], selectedKeys: React.Key[] | React.Key) => {
+  const getTokensByID = (tokenslist: any[], selectedKeys: any[] | any) => {
     var selectedTokens: any[] = []
     let i: number = 0
     if(selectedKeys){
-      selectedKeys.forEach(element => {
+      selectedKeys.forEach((element: any[] | any) => {
         selectedTokens[i] = tokenslist.find(x => x.id === element)
         i++;
       });
+      console.log(selectedTokens);
       return (selectedTokens);
     }
   }
@@ -89,9 +90,11 @@ function App() {
     if(selectedKeys){
       var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
       if(selectedKeys.length == 1){
+        console.log(tokens[0].symbol)
         setSelectToken1(tokens[0].symbol)
       }
       else if(selectedKeys.length == 2){
+        console.log(tokens[1].symbol)
         setSelectToken2(tokens[1].symbol)
       }
       else if(selectedKeys.length >= 2){
@@ -114,11 +117,18 @@ function App() {
   }
 
   const BalanceButton = () => {
+
+    const handleBalanceButton = () =>{
+      if(selectToken1=='WETH'){
+        setInputToken1((parseFloat(wallet.balance)/1000000000000000000).toString())
+      }
+    }
+
     return(
       <div>
       {wallet.status === 'connected' ? (
         <div>
-          <Button variant="outlined" size="large" color="primary">
+          <Button variant="outlined" size="large" color="primary" onClick={handleBalanceButton}>
             <div>Balance: {(parseFloat(wallet.balance)/1000000000000000000)} ETH</div>
           </Button>
         </div>
@@ -206,7 +216,7 @@ function App() {
         <br/>
         <div>
         <ButtonGroup disableElevation variant="contained" color="primary">
-          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')} onClick={handleEstimatePriceButton}>
+          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
           <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||((parseFloat(wallet.balance)/1000000000000000000) < parseFloat(inputToken1))||(inputToken2=='')}>
@@ -216,7 +226,7 @@ function App() {
         </div>
         <br/>
 
-        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={(selectedRowsKeys: string) => setSelectedKeys(selectedRowsKeys)}/>
+        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={(selectedRowsKeys: string|string[]) => setSelectedKeys(selectedRowsKeys)}/>
       </Container>
     </div>
   );

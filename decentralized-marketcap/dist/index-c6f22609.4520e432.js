@@ -23335,7 +23335,7 @@ class Zr extends Vr.Signer {
 exports.AuthereumSigner = Zr;
 var _default = Kr;
 exports.default = _default;
-},{"./index-d3bd4678.js":"../node_modules/use-wallet/dist/index-d3bd4678.js","react":"../node_modules/react/index.js","@aragon/provided-connector":"../node_modules/@aragon/provided-connector/dist/provided-connector.esm.js","events":"../node_modules/events/events.js","buffer":"../node_modules/node-libs-browser/node_modules/buffer/index.js","./_crypto_commonjs-external-1a228943.js":"../node_modules/use-wallet/dist/_crypto_commonjs-external-1a228943.js","./subscriptionManager-0493518a.js":"../node_modules/use-wallet/dist/subscriptionManager-0493518a.js","stream":"../node_modules/stream-browserify/index.js","string_decoder":"../node_modules/node-libs-browser/node_modules/string_decoder/lib/string_decoder.js","./_util_commonjs-external-6c254708.js":"../node_modules/use-wallet/dist/_util_commonjs-external-6c254708.js","crypto":"../node_modules/crypto-browserify/index.js","assert":"../node_modules/assert/assert.js","util":"../node_modules/util/util.js","./index-77f376c4.js":"../node_modules/use-wallet/dist/index-77f376c4.js","querystring":"../node_modules/querystring-es3/index.js","ethers":"../node_modules/ethers/lib.esm/index.js","process":"../node_modules/process/browser.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./index-d3bd4678.js":"../node_modules/use-wallet/dist/index-d3bd4678.js","react":"../node_modules/react/index.js","@aragon/provided-connector":"../node_modules/@aragon/provided-connector/dist/provided-connector.esm.js","events":"../../../../../AppData/Local/Yarn/Data/global/node_modules/events/events.js","buffer":"../../../../../AppData/Local/Yarn/Data/global/node_modules/buffer/index.js","./_crypto_commonjs-external-1a228943.js":"../node_modules/use-wallet/dist/_crypto_commonjs-external-1a228943.js","./subscriptionManager-0493518a.js":"../node_modules/use-wallet/dist/subscriptionManager-0493518a.js","stream":"../../../../../AppData/Local/Yarn/Data/global/node_modules/stream-browserify/index.js","string_decoder":"../../../../../AppData/Local/Yarn/Data/global/node_modules/node-libs-browser/node_modules/string_decoder/lib/string_decoder.js","./_util_commonjs-external-6c254708.js":"../node_modules/use-wallet/dist/_util_commonjs-external-6c254708.js","crypto":"../../../../../AppData/Local/Yarn/Data/global/node_modules/crypto-browserify/index.js","assert":"../../../../../AppData/Local/Yarn/Data/global/node_modules/assert/assert.js","util":"../../../../../AppData/Local/Yarn/Data/global/node_modules/util/util.js","./index-77f376c4.js":"../node_modules/use-wallet/dist/index-77f376c4.js","querystring":"../../../../../AppData/Local/Yarn/Data/global/node_modules/querystring-es3/index.js","ethers":"../node_modules/ethers/lib.esm/index.js","process":"../../../../../AppData/Local/Yarn/Data/global/node_modules/process/browser.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -23363,7 +23363,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58677" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64623" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -23539,5 +23539,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
+},{}]},{},["../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js"], null)
 //# sourceMappingURL=/index-c6f22609.4520e432.js.map

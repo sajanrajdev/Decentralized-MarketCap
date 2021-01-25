@@ -7,17 +7,22 @@ import { DataGrid } from '@material-ui/data-grid';
     { field: 'price', headerName: 'Price',  flex: 303},
     { field: 'totalLiquidity', headerName: 'Liquidity',  flex: 303},
   ];
+
+  interface props {
+    coindata: any | any[]
+    selecRows: any | any[]
+  }
   
-  export default function Tokentable({coindata, selectRows}) {
-    const [selectedTokensKeys, setSelectedTokensKeys] = useState<React.Key | React.Key[]>();
+  export default function Tokentable({coindata, selectRows}:{coindata:any | any[], selectRows:any | any[]}) {
+    const [selectedTokensKeys, setSelectedTokensKeys] = useState<any | any[]>();
 
     return (
       <div style={{ height: 1200, width: '100%' }}>
-        <DataGrid rows={coindata} columns={columns} pageSize={20} checkboxSelection={true} onSelectionChange={(newSelection) => {
+        <DataGrid rows={coindata} columns={columns} pageSize={20} checkboxSelection={false} /* onSelectionChange={(newSelection) => {
             console.log(newSelection.rowIds)
         setSelectedTokensKeys(newSelection.rowIds);
         selectRows(selectedTokensKeys);
-      }}/>
+      }} *//>
       </div>
     );
   }
