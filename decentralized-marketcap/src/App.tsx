@@ -171,7 +171,7 @@ function App() {
       <BalanceButton></BalanceButton>
 
       <Container>
-        <HandleCheckBox></HandleCheckBox>
+        {/* <HandleCheckBox></HandleCheckBox> */}
         <form className="form">
           <div>
             <TextField id="Select1" select label="Select" value={selectToken1} onChange={handleChange1} helperText="Please select your token 1" variant="outlined">
