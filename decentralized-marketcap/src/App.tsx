@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import { ApolloClient, InMemoryCache} from '@apollo/client';
-import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType } from '@uniswap/sdk'
+import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol, getTokensByID } from './utils';
@@ -9,6 +9,7 @@ import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch } fr
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { useWallet } from 'use-wallet'
+import ethers from 'ethers'
 
 interface TradeToken {
   name: string
@@ -28,8 +29,10 @@ function App() {
   const [inputToken1, setInputToken1] = useState('');
   const [inputToken2, setInputToken2] = useState('');
   const [darkmode, setDarkMode] = useState<boolean>(true);
+  const [currentTrade, setCurrentTrade] = useState<Trade>();
 
   const wallet = useWallet();
+  const PRIVATE_KEY = 'e6c67e9e288f999100a7a922c3abd37d8453ef59a4f63ec39edec724c4093f8d'
 
   const mainTheme = createMuiTheme({
     palette:{
@@ -66,24 +69,6 @@ function App() {
     return(null);
   }
 
-  const HandleCheckBox = () => {
-    if(selectedKeys){
-      var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
-      if(selectedKeys.length == 1){
-        console.log(tokens[0].symbol)
-        setSelectToken1(tokens[0].symbol)
-      }
-      else if(selectedKeys.length == 2){
-        console.log(tokens[1].symbol)
-        setSelectToken2(tokens[1].symbol)
-      }
-      else if(selectedKeys.length >= 2){
-        console.log("Toom many selected")
-      }
-    }
-    return(null) 
-  }
-
   // Get realtime price of token1 based on paired token2
   const getPrice = async (id1: string, decimals1: number, id2: string, decimals2: number) => {
     const token1 = new Token(ChainId.MAINNET, id1, decimals1);
@@ -93,17 +78,45 @@ function App() {
     const trade = new Trade(route, new TokenAmount(token1, '10000000000000000'), TradeType.EXACT_INPUT);
     console.log("Execution Price:", trade.executionPrice.toSignificant(6));
     console.log("Mid Price:", route.midPrice.toSignificant(6))
+    setCurrentTrade(trade);
     return trade.executionPrice.toSignificant(6);
   }
 
-  const BalanceButton = () => {
+  const performTrade = async () => {
+    if(currentTrade != undefined){
+      const slippageTolerance = new Percent('50', '10000');
+      const amountOutMin = currentTrade.minimumAmountOut(slippageTolerance).raw;
+      const path = [token2.address, token1.address];
+      const to = '';
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // Maximum wait time for transaction (20min)
+      const value = currentTrade.inputAmount.raw;
 
+      const provider = ethers.getDefaultProvider('mainnet', {
+        infura: 'https://mainnet.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
+      })
+      const signer = new ethers.Wallet(PRIVATE_KEY);
+      const account = signer.connect(provider);
+      const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', [
+        'function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts);'
+      ], account);
+      const tx = await uniswap.sendExacETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
+      console.log('Transaction Hash:',tx.hash);
+      const receipt = await tx.wait();
+      console.log("Transaction was mined in block:", receipt.blockNumber);
+    }
+    else{
+      console.log("Current Trade not defined")
+    }
+
+  }
+
+  // Component for Balance button
+  const BalanceButton = () => {
     const handleBalanceButton = () =>{
       if(selectToken1=='WETH'){
         setInputToken1((parseFloat(wallet.balance)/1000000000000000000).toString())
       }
     }
-
     return(
       <div>
       {wallet.status === 'connected' ? (
@@ -131,6 +144,7 @@ function App() {
     sortTokenList(tokenslist, etherPrice);
   }, []);
 
+  // Handler for Token 1 Selector
   const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken1(event.target.value);
     var token_temp = getTokenBySymbol(tokenslist, event.target.value);
@@ -138,6 +152,7 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
+  // Handler for Token 1 Input
   const handleInputChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value)
     setInputToken1(event.target.value);
@@ -145,6 +160,7 @@ function App() {
       setInputToken2('');
     }
   };
+  // Handler for Token 2 Selector
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken2(event.target.value);
     var token_temp = getTokenBySymbol(tokenslist, event.target.value);
@@ -152,6 +168,7 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
+  // Handler for Price Estimate button
   const handleEstimatePriceButton = async () => {
     var ExecutionPrice = await getPrice(token1.address, token1.decimals, token2.address, token2.decimals);
     setInputToken2((parseFloat(inputToken1)*parseFloat(ExecutionPrice)).toString());

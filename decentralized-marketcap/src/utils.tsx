@@ -65,4 +65,22 @@
     }
   }
 
+/*   const HandleCheckBox = () => {
+    if(selectedKeys){
+      var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
+      if(selectedKeys.length == 1){
+        console.log(tokens[0].symbol)
+        setSelectToken1(tokens[0].symbol)
+      }
+      else if(selectedKeys.length == 2){
+        console.log(tokens[1].symbol)
+        setSelectToken2(tokens[1].symbol)
+      }
+      else if(selectedKeys.length >= 2){
+        console.log("Toom many selected")
+      }
+    }
+    return(null) 
+  } */
+
   export {percentageFormatter, currencyFormatter, capitalize, truncateString, sortTokenList, getTokenBySymbol, getTokensByID}
