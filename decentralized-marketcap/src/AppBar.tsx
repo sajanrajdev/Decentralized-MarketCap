@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import {IconButton} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import { useWallet } from 'use-wallet'
+/* import { useWallet } from 'use-wallet' */
 import {truncateString} from './utils';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ButtonAppBar() {
   const classes = useStyles();
-  const wallet = useWallet();
+/*   const wallet = useWallet(); */
   const [buttonstatus, setButtonStatus] = useState<string | null>('Connect Wallet');
 
   return (
@@ -38,8 +38,8 @@ export default function ButtonAppBar() {
           </IconButton>
           <Typography variant="button" className={classes.title}> 
           </Typography>
-          <Button color="primary" variant="contained">{wallet.account ? truncateString(wallet.account, 7) : "No Account"}</Button>
-          <Button color="primary" variant="contained" onClick={ () => {
+          <Button color="primary" variant="contained">{/* {wallet.account ? truncateString(wallet.account, 7) : "No Account"} */}</Button>
+          <Button color="primary" variant="contained" /* onClick={ () => {
               if(buttonstatus == 'Connect Wallet'){
                 wallet.connect('injected');
                 setButtonStatus('Disconnect Wallet');
@@ -48,7 +48,7 @@ export default function ButtonAppBar() {
                 wallet.reset()
                 setButtonStatus('Connect Wallet');
               }
-            }}>{buttonstatus}</Button>
+            }} */>{buttonstatus}</Button>
         </Toolbar>
       </AppBar>
     </div>
