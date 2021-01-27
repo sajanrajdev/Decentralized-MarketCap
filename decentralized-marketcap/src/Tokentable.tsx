@@ -13,16 +13,12 @@ import { DataGrid } from '@material-ui/data-grid';
     selecRows: any | any[]
   }
   
-  export default function Tokentable({coindata, selectRows}:{coindata:any | any[], selectRows:any | any[]}) {
-    const [selectedTokensKeys, setSelectedTokensKeys] = useState<any | any[]>();
+  export default function Tokentable({coindata}:{coindata:any | any[]}) {
+
 
     return (
       <div style={{ height: 1200, width: '100%' }}>
-        <DataGrid rows={coindata} columns={columns} pageSize={20} checkboxSelection={false} /* onSelectionChange={(newSelection) => {
-            console.log(newSelection.rowIds)
-        setSelectedTokensKeys(newSelection.rowIds);
-        selectRows(selectedTokensKeys);
-      }} *//>
+        <DataGrid rows={coindata} columns={columns} pageSize={20} checkboxSelection={false}/>
       </div>
     );
   }

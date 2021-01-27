@@ -5,7 +5,7 @@ import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, Percent 
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch } from '@material-ui/core';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, rgbToHex } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Onboard from 'bnc-onboard'
@@ -14,6 +14,8 @@ import {ethers} from 'ethers'
 import Notify from 'bnc-notify'
 import { parseBytes32String } from "ethers/lib/utils";
 import { Signer } from "crypto";
+import { BigNumber } from "bignumber.js";
+import { ONE } from "@uniswap/sdk/dist/constants";
 
 
 interface TradeToken {
@@ -27,22 +29,26 @@ function App() {
   
   const [etherPrice, setEtherPrice] = useState<number>(0);
   const [tokenslist, setTokensList] = useState<any | any[]>([]);
-  const [selectedKeys, setSelectedKeys] = useState<any[] | any>([]);
   const [token1, settoken1] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [token2, settoken2] = useState<TradeToken>({name: "", symbol: "", address: "", decimals: 0});
   const [selectToken1, setSelectToken1] = useState('');
   const [selectToken2, setSelectToken2] = useState('');
-  const [inputToken1, setInputToken1] = useState('');
+  const [inputToken1, setInputToken1] = useState('0.01');
   const [inputToken2, setInputToken2] = useState('');
   const [darkmode, setDarkMode] = useState<boolean>(true);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
 
   const PRIVATE_KEY = '';
   const BLOCKNATIVE_API_KEY = '0d211383-2d64-4bea-a170-715d44fc0c7e';
-  const NETWORK_ID = 1;
-  const WEI_TO_ETH = 100000000000000;
+  const NETWORK_ID = 4; // Mainnet 1, Ropsten 3 and Rinkeby 4
+  const WEI_TO_ETH = 1000000000000000000;
   const SLIPPAGE_TOLERANCE = '50'; // 50 Bitps, setting default 0.5%
   const DEADLINE = 20;
+
+  // TEST CONSTANTS (USE NETWORK_ID = 4)
+  const UNI_RINK = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984';
+  const WETH_RINK = '0xc778417e063141139fce010982780140aa0cd5ab';
+  const INFURA_URL_RINK = 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
 
   let web3: any;
 
@@ -82,11 +88,16 @@ function App() {
     await onboard.walletSelect();
     await onboard.walletCheck();
   }
+    function toHex(amount: any) {
+      return `0x${amount.toString(16)}`
+  }
+  
 
     // Get realtime price of token1 based on paired token2
     const getPrice = async (id1: string, decimals1: number, id2: string, decimals2: number) => {
-      const token1 = new Token(ChainId.MAINNET, id1, decimals1);
-      const token2 = new Token(ChainId.MAINNET, id2, decimals2);
+      const token1 = await Fetcher.fetchTokenData(NETWORK_ID, WETH_RINK);
+      const token2 = await Fetcher.fetchTokenData(NETWORK_ID, UNI_RINK);
+      console.log(token1, token2)
       const pair = await Fetcher.fetchPairData(token1, token2);
       const route = new Route([pair], token1);
       const trade = new Trade(route, new TokenAmount(token1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
@@ -95,37 +106,34 @@ function App() {
       setCurrentTrade(trade);
       return trade.executionPrice.toSignificant(6);
     }
-  
+    
     const performTrade = async () => {
       if(currentTrade != undefined){
         const slippageTolerance = new Percent(SLIPPAGE_TOLERANCE, '10000');
-        const amountOutMin = currentTrade.minimumAmountOut(slippageTolerance).raw;
-        const path = [token2.address, token1.address];
+        const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
+        const path = [WETH_RINK, UNI_RINK];
+        console.log(path)
         const to = '0x4ccCf16faf12590DC9a93255224E699FA2197bca'; // Address of receipient - Account 1
         const deadline = Math.floor(Date.now() / 1000) + 60 * DEADLINE; // Maximum wait time for transaction (20min)
-        const value = currentTrade.inputAmount.raw;
-        console.log("Value: ", value);
+        const value = toHex(currentTrade.inputAmount.raw);
   
-/*         const provider = ethers.getDefaultProvider('mainnet', {
-          infura: 'https://mainnet.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
-        }) */
-
+        const provider = await new ethers.providers.InfuraProvider('rinkeby', {
+          infura: INFURA_URL_RINK
+        })
         
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        /* const provider = new ethers.providers.Web3Provider(window.ethereum); */
         console.log(provider);
-/*         const signer = new ethers.Wallet(PRIVATE_KEY); */
-        const signer = (provider).getSigner()
+        const signer = new ethers.Wallet(/* private key */);
         console.log("Signer: ", signer)
         const account = signer.connect(provider);
         console.log("Account: ", account)
-        const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', [
-          'function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts);'
-        ], account);
+        const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], account);
         console.log("Contract: ", uniswap)
-/*         const tx = await uniswap.sendExacETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
+
+        const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
         console.log('Transaction Hash:',tx.hash);
         const receipt = await tx.wait();
-        console.log("Transaction was mined in block:", receipt.blockNumber); */
+        console.log("Transaction was mined in block:", receipt.blockNumber);
       }
       else{
         console.log("Current Trade not defined")
@@ -238,17 +246,17 @@ function App() {
         <br/>
         <div>
         <ButtonGroup disableElevation variant="contained" color="primary">
-          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
+          <Button variant="contained" size="large" color="primary" disabled={/* (inputToken1=='')||(selectToken2=='') */ false} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
-          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')} onClick={performTrade}>
+          <Button variant="contained" size="large" color="primary" disabled={/* (selectToken1!="WETH")||(inputToken2=='') */ false} onClick={performTrade}>
             Swap
           </Button>
         </ButtonGroup>
         </div>
         <br/>
 
-        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)} selectRows={(selectedRowsKeys: string|string[]) => setSelectedKeys(selectedRowsKeys)}/>
+        <Tokentable coindata={sortTokenList(tokenslist, etherPrice)}/>
       </Container>
       <Switch color="secondary" onChange={() => setDarkMode(!darkmode)}></Switch>
     </div>
