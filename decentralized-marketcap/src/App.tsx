@@ -60,10 +60,6 @@ function App() {
   const SLIPPAGE_TOLERANCE = '50'; // 50 Bitps, setting default 0.5%
   const DEADLINE = 20;
 
-  const UNI_RINK = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984';
-  const WETH_RINK = '0xc778417e063141139fce010982780140aa0cd5ab';
-  const DAI_RINK = '0xc7ad46e0b8a400bb3c915120d284aafba8fc4735';
-
   const mainTheme = createMuiTheme({
     palette:{
       type: darkmode ? "dark" : "light",
@@ -101,11 +97,11 @@ function App() {
     })
 
     setOnboard(onboard);
+    setNotify(initNotify())
+
     getEtherPrice();
     getAllTokens();
     sortTokenList(maintokenslist, etherPrice);
-
-    setNotify(initNotify())
   }, []);
 
   // Initializes same wallet as before
@@ -117,8 +113,19 @@ function App() {
     if (previouslySelectedWallet && onboard) {
       onboard.walletSelect(previouslySelectedWallet)
     }
-  }, [onboard])
+  }, [onboard]);
 
+  const readyToTransact = async () => {
+    if(onboard){
+      if (!provider) {
+        const walletSelected = await onboard.walletSelect();
+        if (!walletSelected) return false;
+      }
+      const ready = await onboard.walletCheck();
+      return ready;
+    }
+    else false;
+  }
 
   // Get realtime price of token1 based on paired token2
   const getPrice = async () => {
@@ -140,7 +147,7 @@ function App() {
   }
 
   const performTrade = async () => {
-    if(currentTrade != undefined){
+    if(currentTrade != undefined && readyToTransact()){
       const slippageTolerance = new Percent(SLIPPAGE_TOLERANCE, '10000');
       const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
       const path = [token1.address, token2.address];
@@ -152,6 +159,22 @@ function App() {
 
       const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
       console.log('Transaction Hash:',tx.hash);
+
+      if (notify!=undefined){
+        const { emitter } = notify.hash(tx.hash);
+        emitter.on('txPool', tx => {
+          return {
+            onclick: () =>
+              window.open(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
+          }
+        });
+        emitter.on('txSent', console.log);
+        emitter.on('txConfirmed', console.log);
+        emitter.on('txSpeedUp', console.log);
+        emitter.on('txCancel', console.log);
+        emitter.on('txFailed', console.log);
+      }
+
       const receipt = await tx.wait();
       console.log("Transaction was mined in block:", receipt.blockNumber);
     }
