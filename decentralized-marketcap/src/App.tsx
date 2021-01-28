@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import './App.css';
 import { ApolloClient, InMemoryCache} from '@apollo/client';
-import { ChainId, Token, Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
+import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
-import { sortTokenList, getTokenBySymbol } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, rgbToHex } from '@material-ui/core';
+import { sortTokenList, getTokenBySymbol, toHex } from './utils';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Onboard from 'bnc-onboard'
 import Web3 from 'web3'
 import {ethers} from 'ethers'
-import Notify from 'bnc-notify'
-import { Signer } from "crypto";
+import Notify, { API } from 'bnc-notify'
 import { BigNumber } from "bignumber.js";
+import { initOnboard, initNotify } from './services'
+import getSigner from './signer'
+import { APIO } from "bnc-onboard/dist/src/interfaces";
 
 
 interface TradeToken {
@@ -22,6 +24,8 @@ interface TradeToken {
   address: string
   decimals: number
 }
+
+let provider: any;
 
 function App() {
   
@@ -36,8 +40,15 @@ function App() {
   const [darkmode, setDarkMode] = useState<boolean>(true);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
 
-  const PRIVATE_KEY = '';
-  const BLOCKNATIVE_API_KEY = '0d211383-2d64-4bea-a170-715d44fc0c7e';
+  const [address, setAddress] = useState(null)
+  const [network, setNetwork] = useState(null)
+  const [balance, setBalance] = useState(null)
+  const [wallet, setWallet] = useState({})
+  const [toAddress, setToAddress] = useState('')
+
+  const [onboard, setOnboard] = useState<APIO>()
+  const [notify, setNotify] = useState<API>()
+
   const NETWORK_ID = 4; // Mainnet 1, Ropsten 3 and Rinkeby 4
   const WEI_TO_ETH = 1000000000000000000;
   const SLIPPAGE_TOLERANCE = '50'; // 50 Bitps, setting default 0.5%
@@ -49,7 +60,43 @@ function App() {
   const DAI_RINK = '0xc7ad46e0b8a400bb3c915120d284aafba8fc4735'
   const INFURA_URL_RINK = 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
 
-  let web3: any;
+  useEffect(() => {
+    const onboard = initOnboard({
+      address: setAddress,
+      network: setNetwork,
+      balance: setBalance,
+      wallet: (wallet: any) => {
+        if (wallet.provider) {
+          setWallet(wallet)
+
+          const ethersProvider = new ethers.providers.Web3Provider(
+            wallet.provider
+          )
+
+          provider = ethersProvider
+
+          window.localStorage.setItem('selectedWallet', wallet.name)
+        } else {
+          provider = null
+          setWallet({})
+        }
+      }
+    })
+
+    setOnboard(onboard);
+
+    setNotify(initNotify())
+  }, [])
+
+  useEffect(() => {
+    const previouslySelectedWallet = window.localStorage.getItem(
+      'selectedWallet'
+    )
+
+    if (previouslySelectedWallet && onboard) {
+      onboard.walletSelect(previouslySelectedWallet)
+    }
+  }, [onboard])
 
   const mainTheme = createMuiTheme({
     palette:{
@@ -63,33 +110,7 @@ function App() {
     }
   });
 
-  const onboard = Onboard({
-    dappId: BLOCKNATIVE_API_KEY,       // [String] The API key created by step one above
-    networkId: NETWORK_ID,  // [Integer] The Ethereum network ID your Dapp uses.
-    subscriptions: {
-      wallet: wallet => {
-         web3 = new Web3(wallet.provider)
-         console.log(wallet.name, " is now connected!")
-      }
-    },
-    darkMode: true,
-    walletSelect: {
-      wallets: [
-        { walletName: "opera", preferred: true },
-        { walletName: "metamask", preferred: true },
-        { walletName: "authereum", preferred: true },
-        { walletName: 'torus', preferred: true  }
-      ]
-    }
-  });
 
-  const connectWallet = async () => {
-    await onboard.walletSelect();
-    await onboard.walletCheck();
-  }
-    function toHex(amount: any) {
-      return `0x${amount.toString(16)}`
-  }
   
 
     // Get realtime price of token1 based on paired token2
@@ -103,28 +124,20 @@ function App() {
       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
       console.log("Mid Price:", route.midPrice.toSignificant(6))
       setCurrentTrade(trade);
+      console.log(address)
       return trade.executionPrice.toSignificant(6);
     }
-    
+  
     const performTrade = async () => {
       if(currentTrade != undefined){
         const slippageTolerance = new Percent(SLIPPAGE_TOLERANCE, '10000');
         const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
         const path = [WETH_RINK, UNI_RINK];
-        console.log(path)
-        const to = '0x4ccCf16faf12590DC9a93255224E699FA2197bca'; // Address of receipient - Account 1
+        const to = address; // Sends to selected address
         const deadline = Math.floor(Date.now() / 1000) + 60 * DEADLINE; // Maximum wait time for transaction (20min)
         const value = toHex(currentTrade.inputAmount.raw);
-  
-        const provider = await new ethers.providers.InfuraProvider('rinkeby', {
-          infura: INFURA_URL_RINK
-        })
-        
-        /* const provider = new ethers.providers.Web3Provider(window.ethereum); */
-        console.log(provider);
-        const signer = new ethers.Wallet(/* private key */);
-        const account = signer.connect(provider);
-        const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], account);
+        const signer = (new ethers.providers.Web3Provider(window.ethereum)).getSigner();
+        const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
 
         const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
         console.log('Transaction Hash:',tx.hash);
@@ -201,18 +214,22 @@ function App() {
     <ThemeProvider theme={mainTheme}>
       <Paper>
     <div className="App">
-      <ButtonAppBar></ButtonAppBar>
+      <ButtonAppBar address={address}></ButtonAppBar>
       <header>
         <h1>
           Uniswap Remote Trader
         </h1>
       </header>
-
-        <div>
-          <Button variant="outlined" size="large" color="primary" onClick={connectWallet}>
-            <div>Connect</div>
+      <div>
+        <Button
+            className="bn-demo-button" variant="outlined" size="large" color="primary"
+                onClick={() => {
+                  if(onboard){
+                  onboard.walletSelect()
+                  }
+                }}>
+                Select a Wallet
           </Button>
-          <br/>
         </div>
 
       <Container>

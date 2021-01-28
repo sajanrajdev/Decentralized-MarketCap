@@ -65,6 +65,11 @@
     }
   }
 
+  // Function to convert a number into HEX
+  function toHex(amount: any) {
+    return `0x${amount.toString(16)}`
+}
+
 /*   const HandleCheckBox = () => {
     if(selectedKeys){
       var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
@@ -83,4 +88,4 @@
     return(null) 
   } */
 
-  export {percentageFormatter, currencyFormatter, capitalize, truncateString, sortTokenList, getTokenBySymbol, getTokensByID}
+  export {percentageFormatter, currencyFormatter, capitalize, truncateString, sortTokenList, getTokenBySymbol, getTokensByID, toHex}
