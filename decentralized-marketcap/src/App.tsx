@@ -12,10 +12,8 @@ import Onboard from 'bnc-onboard'
 import Web3 from 'web3'
 import {ethers} from 'ethers'
 import Notify from 'bnc-notify'
-import { parseBytes32String } from "ethers/lib/utils";
 import { Signer } from "crypto";
 import { BigNumber } from "bignumber.js";
-import { ONE } from "@uniswap/sdk/dist/constants";
 
 
 interface TradeToken {
@@ -48,6 +46,7 @@ function App() {
   // TEST CONSTANTS (USE NETWORK_ID = 4)
   const UNI_RINK = '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984';
   const WETH_RINK = '0xc778417e063141139fce010982780140aa0cd5ab';
+  const DAI_RINK = '0xc7ad46e0b8a400bb3c915120d284aafba8fc4735'
   const INFURA_URL_RINK = 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
 
   let web3: any;
@@ -124,11 +123,8 @@ function App() {
         /* const provider = new ethers.providers.Web3Provider(window.ethereum); */
         console.log(provider);
         const signer = new ethers.Wallet(/* private key */);
-        console.log("Signer: ", signer)
         const account = signer.connect(provider);
-        console.log("Account: ", account)
         const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], account);
-        console.log("Contract: ", uniswap)
 
         const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
         console.log('Transaction Hash:',tx.hash);
