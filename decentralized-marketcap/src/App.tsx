@@ -88,16 +88,6 @@ function App() {
     setNotify(initNotify())
   }, [])
 
-  useEffect(() => {
-    const previouslySelectedWallet = window.localStorage.getItem(
-      'selectedWallet'
-    )
-
-    if (previouslySelectedWallet && onboard) {
-      onboard.walletSelect(previouslySelectedWallet)
-    }
-  }, [onboard])
-
   const mainTheme = createMuiTheme({
     palette:{
       type: darkmode ? "dark" : "light",
@@ -214,23 +204,12 @@ function App() {
     <ThemeProvider theme={mainTheme}>
       <Paper>
     <div className="App">
-      <ButtonAppBar address={address}></ButtonAppBar>
+      <ButtonAppBar address={address} onboard={onboard}></ButtonAppBar>
       <header>
         <h1>
           Uniswap Remote Trader
         </h1>
       </header>
-      <div>
-        <Button
-            className="bn-demo-button" variant="outlined" size="large" color="primary"
-                onClick={() => {
-                  if(onboard){
-                  onboard.walletSelect()
-                  }
-                }}>
-                Select a Wallet
-          </Button>
-        </div>
 
       <Container>
         <form className="form">
@@ -259,10 +238,10 @@ function App() {
         <br/>
         <div>
         <ButtonGroup disableElevation variant="contained" color="primary">
-          <Button variant="contained" size="large" color="primary" disabled={/* (inputToken1=='')||(selectToken2=='') */ false} onClick={handleEstimatePriceButton}>
+          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
-          <Button variant="contained" size="large" color="primary" disabled={/* (selectToken1!="WETH")||(inputToken2=='') */ false} onClick={performTrade}>
+          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')} onClick={performTrade}>
             Swap
           </Button>
         </ButtonGroup>

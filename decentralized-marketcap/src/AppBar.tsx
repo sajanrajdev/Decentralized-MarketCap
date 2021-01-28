@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -22,9 +22,21 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function ButtonAppBar({address}:{address: any | any[]}) {
+export default function ButtonAppBar({address, onboard}:{address: any | any[] , onboard: any}) {
   const classes = useStyles();
   const [buttonstatus, setButtonStatus] = useState<string | null>('Connect Wallet');
+
+  useEffect(() => {
+    const previouslySelectedWallet = window.localStorage.getItem(
+      'selectedWallet'
+    )
+
+    if (previouslySelectedWallet && onboard) {
+      onboard.walletSelect(previouslySelectedWallet)
+      setButtonStatus('Disconnect Wallet');
+    }
+  }, [onboard])
+
   return (
     <div className={classes.root}>
 
@@ -39,9 +51,11 @@ export default function ButtonAppBar({address}:{address: any | any[]}) {
           <Button color="primary" variant="contained" onClick={ () => {
               if(buttonstatus == 'Connect Wallet'){
                 setButtonStatus('Disconnect Wallet');
+                onboard.walletSelect()
               }
               else{
                 setButtonStatus('Connect Wallet');
+                onboard.walletReset();
               }
             }}>{buttonstatus}</Button>
         </Toolbar>
