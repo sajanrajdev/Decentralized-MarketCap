@@ -3,7 +3,6 @@ import Onboard from 'bnc-onboard'
 
 const networkId = 4
 const rpcUrl = 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'
-const apiUrl = process.env.REACT_APP_API_URL
 const dappId = '0d211383-2d64-4bea-a170-715d44fc0c7e'
 
 export function initOnboard(subscriptions: any) {
@@ -12,7 +11,6 @@ export function initOnboard(subscriptions: any) {
     dappId,
     hideBranding: false,
     networkId,
-    apiUrl,
     // darkMode: true,
     subscriptions,
     walletSelect: {
@@ -59,6 +57,5 @@ export function initNotify() {
   return notify({
     dappId,
     networkId,
-    apiUrl
   })
 }

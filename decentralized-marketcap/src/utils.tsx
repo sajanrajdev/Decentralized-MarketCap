@@ -70,6 +70,24 @@
     return `0x${amount.toString(16)}`
 }
 
+  // Function to return a network name 
+  function networkName(id: number | string) {
+    switch (Number(id)) {
+      case 1:
+        return 'main'
+      case 3:
+        return 'ropsten'
+      case 4:
+        return 'rinkeby'
+      case 5:
+        return 'goerli'
+      case 42:
+        return 'kovan'
+      default:
+        return 'local'
+    }
+  }
+
 /*   const HandleCheckBox = () => {
     if(selectedKeys){
       var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
@@ -88,4 +106,12 @@
     return(null) 
   } */
 
-  export {percentageFormatter, currencyFormatter, capitalize, truncateString, sortTokenList, getTokenBySymbol, getTokensByID, toHex}
+  export {percentageFormatter, 
+    currencyFormatter, 
+    capitalize, 
+    truncateString, 
+    sortTokenList, 
+    getTokenBySymbol, 
+    getTokensByID, 
+    toHex, 
+    networkName}

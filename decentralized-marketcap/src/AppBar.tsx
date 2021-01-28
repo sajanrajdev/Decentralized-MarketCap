@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import {IconButton} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import {truncateString} from './utils';
+import {truncateString, networkName} from './utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function ButtonAppBar({address, onboard}:{address: any | any[] , onboard: any}) {
+export default function ButtonAppBar({address, onboard, network}:{address: any | any[] , onboard: any, network: any}) {
   const classes = useStyles();
   const [buttonstatus, setButtonStatus] = useState<string | null>('Connect Wallet');
 
@@ -47,11 +47,13 @@ export default function ButtonAppBar({address, onboard}:{address: any | any[] , 
           </IconButton>
           <Typography variant="button" className={classes.title}> 
           </Typography>
-          <Button color="primary" variant="contained">{truncateString(address, 6)}</Button>
-          <Button color="primary" variant="contained" onClick={ () => {
+          <Button color="primary" variant="contained">{networkName(network)}</Button>
+          {address && <Button color="primary" variant="contained">{truncateString(address, 6)}</Button>}
+          <Button color="primary" variant="contained" onClick={ async () => {
               if(buttonstatus == 'Connect Wallet'){
                 setButtonStatus('Disconnect Wallet');
-                onboard.walletSelect()
+                await onboard.walletSelect()
+                await onboard.walletCheck()
               }
               else{
                 setButtonStatus('Connect Wallet');
