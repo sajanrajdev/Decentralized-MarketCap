@@ -26,6 +26,9 @@ Languages: Typescript, HTML and CSS
 - Receive live notifications on transaction's state
 - See Uniswap's Mainnet token's data and liquidity
 
+## To do
+- Enable transactions on Mainnet and for any token supported by Uniswap
+
 ## Get started
 ```
 yarn
