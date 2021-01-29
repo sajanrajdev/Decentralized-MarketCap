@@ -2,18 +2,17 @@ import React, { useEffect, useState } from "react";
 import './App.css';
 import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
-import Tokentable from './Tokentable';
+import Tokentable from './Components/Tokentable';
+import ButtonAppBar from './Components/AppBar'
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol, toHex } from './utils';
 import { Container, TextField, MenuItem, Button, ButtonGroup } from '@material-ui/core';
-import { Paper, CircularProgress, Grid, Box, Slider, Typography, Snackbar } from '@material-ui/core';
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
-import ButtonAppBar from './AppBar'
+import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
-import Notify, { API } from 'bnc-notify'
-import { initOnboard, initNotify } from './services'
-import { APIO } from "bnc-onboard/dist/src/interfaces";
+import Notify, { APIN } from 'bnc-notify'
+import { initOnboard, initNotify } from './Components/Blocknative'
+import { API } from "bnc-onboard/dist/src/interfaces";
 import { RinkebyTokens } from "./RinkbeyTokens"
 
 
@@ -67,8 +66,8 @@ function App() {
   const [balance, setBalance] = useState<string>();
   const [wallet, setWallet] = useState({});
 
-  const [onboard, setOnboard] = useState<APIO>()
-  const [notify, setNotify] = useState<API>()
+  const [onboard, setOnboard] = useState<API>()
+  const [notify, setNotify] = useState<APIN>()
 
   const NETWORK_ID = 4; // Working network, to be selectable in the future (Mainnet 1, Ropsten 3 and Rinkeby 4)
   const WEI_TO_ETH = 1000000000000000000;
