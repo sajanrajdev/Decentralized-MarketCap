@@ -48,6 +48,8 @@ function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
   const [tolerance, setTolerance] = useState<any>(0.5);
+  const [deadline, setDeadline] = useState<string>('20');
+  const [gasprice, setGasPrice] = useState<string>('20');
 
   const [address, setAddress] = useState(null);
   const [walletnetwork, setWalletNetwork] = useState<number>();
@@ -59,8 +61,7 @@ function App() {
 
   const NETWORK_ID = 4; // Working network, to be selectable in the future (Mainnet 1, Ropsten 3 and Rinkeby 4)
   const WEI_TO_ETH = 1000000000000000000;
-  const SLIPPAGE_TOLERANCE = '50'; // 50 Bitps, setting default 0.5%
-  const DEADLINE = 20;
+  const WEI_TO_GWEI = 1000000000;
 
   const mainTheme = createMuiTheme({
     palette:{
@@ -111,7 +112,6 @@ function App() {
     const previouslySelectedWallet = window.localStorage.getItem(
       'selectedWallet'
     )
-
     if (previouslySelectedWallet && onboard) {
       onboard.walletSelect(previouslySelectedWallet)
     }
@@ -156,12 +156,12 @@ function App() {
       const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
       const path = [ethers.utils.getAddress(token1.address), ethers.utils.getAddress(token2.address)];
       const to = address; // Sends to selected address on wallet
-      const deadline = Math.floor(Date.now() / 1000) + 60 * DEADLINE; // Maximum wait time for transaction (20min)
+      const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
       const value = toHex(currentTrade.inputAmount.raw);
       const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
       const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
 
-      const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
+      const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value, gasPrice: parseInt(gasprice)*WEI_TO_GWEI});
       console.log('Transaction Hash:',tx.hash);
 
       if (notify != undefined){
@@ -233,7 +233,6 @@ function App() {
   };
   // Handler for Token 1 Input
   const handleInputChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
     setInputToken1(event.target.value);
     setInputToken2('');
   };
@@ -245,8 +244,29 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
+    // Handler for Deadline input
+  const handleInputDeadline = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value)
+    if(event.target.value==''){
+      setDeadline('');
+    }
+    else{
+      setDeadline(parseFloat(event.target.value).toFixed(0));
+    }
+  };
+    // Handler for Deadline input
+    const handleInputGasPrice = (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log(event.target.value)
+      if(event.target.value==''){
+        setGasPrice('');
+      }
+      else{
+        setGasPrice(parseFloat(event.target.value).toFixed(0));
+      }
+    };
   // Handler for Price Estimate button
   const handleEstimatePriceButton = async () => {
+    console.log(gasprice)
     if(walletnetwork==NETWORK_ID){
       var ExecutionPrice = await getPrice();
       if (ExecutionPrice){
@@ -263,7 +283,7 @@ function App() {
   const BalanceButton = () => {
     const handleBalanceButton = () =>{
       if(balance != null && balance != undefined && selectToken1 == 'WETH'){
-        setInputToken1((parseFloat(balance)/1000000000000000000).toFixed(6).toString())
+        setInputToken1((parseFloat(balance)/1000000000000000000).toString())
         setInputToken2(''); // Reset input 2
       }
     }
@@ -286,6 +306,7 @@ function App() {
       </div>
     )
   }
+  
 
   return (
     <ThemeProvider theme={mainTheme}>
@@ -301,57 +322,71 @@ function App() {
       <Container>
       <Grid container spacing={2} direction={'column'} alignItems={'center'}>
         <Grid item>
-          <Paper elevation={3} style={{width: 550, height: 320}}>
+          <Paper elevation={3} style={{width: 550, height: 400}}>
             <Box p={1} m={1}>
-            <Grid container spacing={2} direction={'column'} alignItems={'center'} justify={'center'}>
-            <Grid item container spacing={2} direction={'row'} alignItems={'center'} justify={'center'}>
-              <Grid item>
-                <Card style={{height: 35}} p={1} m={1}><CardContent>{balance ? `Balance: ${(parseFloat(balance)/1000000000000000000).toFixed(6).toString()} ETH` : 'Balance:'}</CardContent></Card>
-              </Grid> 
-              <Grid item>
-                <BalanceButton></BalanceButton>
+              <Grid container spacing={2} direction={'column'} alignItems={'center'} justify={'center'}>
+                <Grid item container spacing={2} direction={'row'} alignItems={'center'} justify={'flex-end'}>
+                  <Grid item>
+                    {balance ? `Balance: ${(parseFloat(balance)/1000000000000000000).toFixed(6).toString()} ETH` : 'Balance:'}
+                  </Grid> 
+                  <Grid item>
+                    <BalanceButton></BalanceButton>
+                  </Grid>
+                </Grid>
+                <Grid item container spacing={2} direction={'row'} justify={'center'}>
+                  <Grid item>
+                    <TextField id="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
+                        <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
+                          {tokenslist[0].symbol} 
+                        </MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid item>
+                    <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
+                  </Grid>
+                </Grid> 
+                <Grid item container spacing={2} direction={'row'} justify={'center'}>
+                  <Grid item>
+                    <TextField id="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
+                      {tokenslist.slice(1, 3).map((option: any | any[]) => (
+                        <MenuItem key={option.id} value={option.symbol}>
+                          {option.symbol}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item>
+                    <TextField id="Input2" label="Estimated Price" placeholder="0.0" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
+                  </Grid>
+                </Grid>
               </Grid>
-            </Grid>
-              <Grid item container spacing={2} direction={'row'} justify={'center'}>
+              <Grid container spacing={2} direction={'column'} alignItems={'center'}>
                 <Grid item>
-                  <TextField id="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
-                      <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
-                        {tokenslist[0].symbol} 
-                      </MenuItem>
-                  </TextField>
+                  <Typography id="discrete-slider-small-steps" gutterBottom>
+                    Slippage Tolerance
+                  </Typography>
+                  <Slider
+                    defaultValue={0.5}
+                    aria-labelledby="discrete-slider-small-steps"
+                    step={0.1}
+                    marks
+                    min={0.0}
+                    max={1.0}
+                    valueLabelDisplay="auto"
+                    onChangeCommitted = { (e, value) => setTolerance(value)}
+                  />
                 </Grid>
-                <Grid item>
-                  <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
-                </Grid>
-              </Grid> 
-              <Grid item container spacing={2} direction={'row'} justify={'center'}>
-                <Grid item>
-                  <TextField id="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
-                    {tokenslist.slice(1, 3).map((option: any | any[]) => (
-                      <MenuItem key={option.id} value={option.symbol}>
-                        {option.symbol}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-                <Grid item>
-                  <TextField id="Input2" label="Estimated Price" placeholder="0.0" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
-                </Grid>
+                <Grid container item spacing={5} direction={'row'} justify={'center'}>
+                  <Grid item>
+                    <TextField id="Gas Price" label="" size="small" helperText="Gas Price" placeholder="20" variant="standard" onChange={handleInputGasPrice} value={gasprice} style = {{width: 60}} color="primary" type="number" error={(gasprice=='')||parseInt(gasprice)<=0}/>
+                    GWei
+                  </Grid>
+                  <Grid item>
+                    <TextField id="Deadline" label="" size="small" helperText="Deadline" placeholder="20" variant="standard" onChange={handleInputDeadline} value={deadline} style = {{width: 50}} color="primary" type="number" error={(deadline=='')||parseInt(deadline)<=0}/>
+                    min
+                  </Grid>
+                </Grid>  
               </Grid>
-            </Grid>
-            <Typography id="discrete-slider-small-steps" gutterBottom>
-                Slippage Tolerance
-              </Typography>
-              <Slider
-                defaultValue={0.5}
-                aria-labelledby="discrete-slider-small-steps"
-                step={0.1}
-                marks
-                min={0.0}
-                max={1.0}
-                valueLabelDisplay="auto"
-                onChangeCommitted = { (e, value) => setTolerance(value)}
-              />
             </Box>
           </Paper>
         </Grid>
@@ -363,7 +398,7 @@ function App() {
           <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
-          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')} onClick={performTrade}>
+          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')} onClick={performTrade}>
             Swap
           </Button>
         </ButtonGroup>
@@ -371,10 +406,10 @@ function App() {
       </Grid>
       <br/>
         <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
-
       </Container>
       <Switch color="secondary" onChange={() => setDarkMode(!darkmode)}></Switch>
       <div >© 2021 Sajan Rajdev. All Rights Reserved.</div>
+      <br/>
     </Paper>
     </div>
     </ThemeProvider>
