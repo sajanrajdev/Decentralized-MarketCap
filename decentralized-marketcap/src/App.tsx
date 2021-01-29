@@ -4,10 +4,10 @@ import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
-import { sortTokenList, getTokenBySymbol, toHex } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch } from '@material-ui/core';
+import { sortTokenList, getTokenBySymbol, toHex, truncateString } from './utils';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, CircularProgress, Grid } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
 import Notify, { API } from 'bnc-notify'
 import { BigNumber } from "bignumber.js";
@@ -45,11 +45,12 @@ function App() {
   const [inputToken1, setInputToken1] = useState('');
   const [inputToken2, setInputToken2] = useState('');
   const [darkmode, setDarkMode] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
 
   const [address, setAddress] = useState(null);
   const [walletnetwork, setWalletNetwork] = useState<number>();
-  const [balance, setBalance] = useState(null);
+  const [balance, setBalance] = useState<string>();
   const [wallet, setWallet] = useState({});
 
   const [onboard, setOnboard] = useState<APIO>()
@@ -104,7 +105,7 @@ function App() {
     sortTokenList(maintokenslist, etherPrice);
   }, []);
 
-  // Initializes same wallet as before
+  // Initializes a previously connected wallet
   useEffect(() => {
     const previouslySelectedWallet = window.localStorage.getItem(
       'selectedWallet'
@@ -115,6 +116,7 @@ function App() {
     }
   }, [onboard]);
 
+  // Verifies if wallet has already been selected and checks up
   const readyToTransact = async () => {
     if(onboard){
       if (!provider) {
@@ -130,19 +132,20 @@ function App() {
   // Get realtime price of token1 based on paired token2
   const getPrice = async () => {
     if(walletnetwork == NETWORK_ID){
-      const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, token1.address); 
-      const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, token2.address);
-      console.log(tradetoken1, token2)
+      setLoading(true);
+      const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token1.address)); 
+      const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address));
       const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2);
       const route = new Route([pair], tradetoken1);
       const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
       console.log("Mid Price:", route.midPrice.toSignificant(6))
       setCurrentTrade(trade);
+      setLoading(false);
       return trade.executionPrice.toSignificant(6);
     }
     else{
-      console.log("Please switch to Rinkeby network")
+      console.log("Please switch to Rinkeby network");
     }
   }
 
@@ -150,17 +153,17 @@ function App() {
     if(currentTrade != undefined && readyToTransact()){
       const slippageTolerance = new Percent(SLIPPAGE_TOLERANCE, '10000');
       const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
-      const path = [token1.address, token2.address];
+      const path = [ethers.utils.getAddress(token1.address), ethers.utils.getAddress(token2.address)];
       const to = address; // Sends to selected address on wallet
       const deadline = Math.floor(Date.now() / 1000) + 60 * DEADLINE; // Maximum wait time for transaction (20min)
       const value = toHex(currentTrade.inputAmount.raw);
       const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
-      const uniswap = new ethers.Contract('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
+      const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
 
       const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, deadline, {value, gasPrice: 20e9});
       console.log('Transaction Hash:',tx.hash);
 
-      if (notify!=undefined){
+      if (notify != undefined){
         const { emitter } = notify.hash(tx.hash);
         emitter.on('txPool', tx => {
           return {
@@ -181,7 +184,6 @@ function App() {
     else{
       console.log("Current Trade not defined")
     }
-
   }
 
   const client = new ApolloClient({
@@ -254,9 +256,36 @@ function App() {
     }
     else{
       console.log("Please switch to Rinkeby network")
+      alert("Please switch to Rinkeby network");
     }
 
   };
+
+  const BalanceButton = () => {
+    const handleBalanceButton = () =>{
+      if(balance != null && balance != undefined && selectToken1 == 'WETH'){
+        setInputToken1((parseFloat(balance)/1000000000000000000).toString())
+      }
+    }
+    return(
+      <div>
+      {wallet && (balance != null && balance != undefined) ? (
+        <div>
+          <Button variant="outlined" size="large" color="primary" onClick={handleBalanceButton}>
+            <div>Balance: {truncateString((parseFloat(balance)/1000000000000000000).toString(), 8)} ETH</div>
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <Button variant="outlined" size="large" color="primary" disabled>
+            <div>Balance: Disconnected</div>
+          </Button>
+        </div>
+      )}
+      <br/>
+      </div>
+    )
+  }
 
   return (
     <ThemeProvider theme={mainTheme}>
@@ -270,33 +299,31 @@ function App() {
       </header>
       <NetowrkChange walletnetowrk={walletnetwork}></NetowrkChange>
 
+      <BalanceButton></BalanceButton>
+
       <Container>
-        <form className="form">
-          <div>
-            <TextField id="Select1" select label="Select" value={selectToken1} onChange={handleChange1} helperText="Please select your token 1" variant="outlined">
-{/*               {tokenslist.map((option: any | any[]) => (
-                <MenuItem key={option.id} value={option.symbol}>
-                  {option.symbol}
-                </MenuItem>
-              ))} */}
-                <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
-                  {tokenslist[0].symbol} 
-                </MenuItem>
-            </TextField>
-            <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
-          </div>
-          <br/>
-          <div>
-            <TextField id="Select2" select label="Select" value={selectToken2} onChange={handleChange2} helperText="Please select your token 2" variant="outlined">
-              {tokenslist.slice(1, 3).map((option: any | any[]) => (
-                <MenuItem key={option.id} value={option.symbol}>
-                  {option.symbol}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} color="primary" disabled type="number"/>
-          </div>
-        </form>
+          <form className="form">
+            <div>
+              <TextField id="Select1" select label="Token" value={selectToken1} style = {{width: 230}} onChange={handleChange1} helperText="From" variant="outlined">
+                  <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
+                    {tokenslist[0].symbol} 
+                  </MenuItem>
+              </TextField>
+              <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
+            </div>
+            <br/>
+            <div>
+              <TextField id="Select2" select label="Token" value={selectToken2} style = {{width: 230}} onChange={handleChange2} helperText="To" variant="outlined">
+                {tokenslist.slice(1, 3).map((option: any | any[]) => (
+                  <MenuItem key={option.id} value={option.symbol}>
+                    {option.symbol}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
+            </div>
+            {loading && <CircularProgress />}
+          </form>
         <br/>
         <div>
         <ButtonGroup disableElevation variant="contained" color="primary">
