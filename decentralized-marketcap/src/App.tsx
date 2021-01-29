@@ -5,7 +5,7 @@ import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol, toHex, truncateString } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, CircularProgress, Grid } from '@material-ui/core';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, CircularProgress, Grid, Box, Slider, Typography, Card, CardContent } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
@@ -47,6 +47,7 @@ function App() {
   const [darkmode, setDarkMode] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
+  const [tolerance, setTolerance] = useState<any>(0.5);
 
   const [address, setAddress] = useState(null);
   const [walletnetwork, setWalletNetwork] = useState<number>();
@@ -151,7 +152,7 @@ function App() {
 
   const performTrade = async () => {
     if(currentTrade != undefined && readyToTransact()){
-      const slippageTolerance = new Percent(SLIPPAGE_TOLERANCE, '10000');
+      const slippageTolerance = new Percent((tolerance*100).toString(), '10000');
       const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
       const path = [ethers.utils.getAddress(token1.address), ethers.utils.getAddress(token2.address)];
       const to = address; // Sends to selected address on wallet
@@ -234,9 +235,7 @@ function App() {
   const handleInputChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log(event.target.value)
     setInputToken1(event.target.value);
-    if(event.target.value==''){
-      setInputToken2('');
-    }
+    setInputToken2('');
   };
   // Handler for Token 2 Selector
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -264,21 +263,22 @@ function App() {
   const BalanceButton = () => {
     const handleBalanceButton = () =>{
       if(balance != null && balance != undefined && selectToken1 == 'WETH'){
-        setInputToken1((parseFloat(balance)/1000000000000000000).toString())
+        setInputToken1((parseFloat(balance)/1000000000000000000).toFixed(6).toString())
+        setInputToken2(''); // Reset input 2
       }
     }
     return(
       <div>
       {wallet && (balance != null && balance != undefined) ? (
         <div>
-          <Button variant="outlined" size="large" color="primary" onClick={handleBalanceButton}>
-            <div>Balance: {truncateString((parseFloat(balance)/1000000000000000000).toString(), 8)} ETH</div>
+          <Button variant="outlined" color="primary" onClick={handleBalanceButton}>
+            <div>MAX</div>
           </Button>
         </div>
       ) : (
         <div>
-          <Button variant="outlined" size="large" color="primary" disabled>
-            <div>Balance: Disconnected</div>
+          <Button variant="outlined" color="primary" disabled>
+            <div>MAX</div>
           </Button>
         </div>
       )}
@@ -289,8 +289,8 @@ function App() {
 
   return (
     <ThemeProvider theme={mainTheme}>
-      <Paper>
     <div className="App">
+      <Paper>
       <ButtonAppBar address={address} onboard={onboard} network={walletnetwork}></ButtonAppBar>
       <header>
         <h1>
@@ -298,34 +298,67 @@ function App() {
         </h1>
       </header>
       <NetowrkChange walletnetowrk={walletnetwork}></NetowrkChange>
-
-      <BalanceButton></BalanceButton>
-
       <Container>
-          <form className="form">
-            <div>
-              <TextField id="Select1" select label="Token" value={selectToken1} style = {{width: 230}} onChange={handleChange1} helperText="From" variant="outlined">
-                  <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
-                    {tokenslist[0].symbol} 
-                  </MenuItem>
-              </TextField>
-              <TextField id="Input1" label="Amount" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
-            </div>
-            <br/>
-            <div>
-              <TextField id="Select2" select label="Token" value={selectToken2} style = {{width: 230}} onChange={handleChange2} helperText="To" variant="outlined">
-                {tokenslist.slice(1, 3).map((option: any | any[]) => (
-                  <MenuItem key={option.id} value={option.symbol}>
-                    {option.symbol}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField id="Input2" label="Estimated Execution Price" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
-            </div>
-            {loading && <CircularProgress />}
-          </form>
-        <br/>
-        <div>
+      <Grid container spacing={2} direction={'column'} alignItems={'center'}>
+        <Grid item>
+          <Paper elevation={3} style={{width: 550, height: 320}}>
+            <Box p={1} m={1}>
+            <Grid container spacing={2} direction={'column'} alignItems={'center'} justify={'center'}>
+            <Grid item container spacing={2} direction={'row'} alignItems={'center'} justify={'center'}>
+              <Grid item>
+                <Card style={{height: 35}} p={1} m={1}><CardContent>{balance ? `Balance: ${(parseFloat(balance)/1000000000000000000).toFixed(6).toString()} ETH` : 'Balance:'}</CardContent></Card>
+              </Grid> 
+              <Grid item>
+                <BalanceButton></BalanceButton>
+              </Grid>
+            </Grid>
+              <Grid item container spacing={2} direction={'row'} justify={'center'}>
+                <Grid item>
+                  <TextField id="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
+                      <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
+                        {tokenslist[0].symbol} 
+                      </MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item>
+                  <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
+                </Grid>
+              </Grid> 
+              <Grid item container spacing={2} direction={'row'} justify={'center'}>
+                <Grid item>
+                  <TextField id="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
+                    {tokenslist.slice(1, 3).map((option: any | any[]) => (
+                      <MenuItem key={option.id} value={option.symbol}>
+                        {option.symbol}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item>
+                  <TextField id="Input2" label="Estimated Price" placeholder="0.0" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Typography id="discrete-slider-small-steps" gutterBottom>
+                Slippage Tolerance
+              </Typography>
+              <Slider
+                defaultValue={0.5}
+                aria-labelledby="discrete-slider-small-steps"
+                step={0.1}
+                marks
+                min={0.0}
+                max={1.0}
+                valueLabelDisplay="auto"
+                onChangeCommitted = { (e, value) => setTolerance(value)}
+              />
+            </Box>
+          </Paper>
+        </Grid>
+        <Grid item>      
+          {loading && <CircularProgress />} 
+        </Grid>
+        <Grid item>   
         <ButtonGroup disableElevation variant="contained" color="primary">
           <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
             Estimate
@@ -334,14 +367,16 @@ function App() {
             Swap
           </Button>
         </ButtonGroup>
-        </div>
-        <br/>
-
+        </Grid> 
+      </Grid>
+      <br/>
         <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
+
       </Container>
       <Switch color="secondary" onChange={() => setDarkMode(!darkmode)}></Switch>
-    </div>
+      <div >© 2021 Sajan Rajdev. All Rights Reserved.</div>
     </Paper>
+    </div>
     </ThemeProvider>
   );
 }
