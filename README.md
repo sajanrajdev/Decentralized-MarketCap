@@ -11,6 +11,7 @@ The purpose of the development of this project was to test several tools and tec
 - GraphQL
 - Apollo
 - Create-React-App
+- Parcel
 
 Languages: Typescript, HTML and CSS
 
@@ -25,6 +26,7 @@ Languages: Typescript, HTML and CSS
 - Perform transaction
 - Receive live notifications on transaction's state
 - See Uniswap's Mainnet token's data and liquidity
+- Dark/Light Mode
 
 ## To do
 - Enable transactions on Mainnet and for any token supported by Uniswap
