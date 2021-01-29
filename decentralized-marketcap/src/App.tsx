@@ -5,12 +5,13 @@ import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol, toHex } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
+import { Container, TextField, MenuItem, Button, ButtonGroup } from '@material-ui/core';
+import { Paper, CircularProgress, Grid, Box, Slider, Typography, Snackbar } from '@material-ui/core';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
 import Notify, { API } from 'bnc-notify'
-import { BigNumber } from "bignumber.js";
 import { initOnboard, initNotify } from './services'
 import { APIO } from "bnc-onboard/dist/src/interfaces";
 import { RinkebyTokens } from "./RinkbeyTokens"
@@ -151,8 +152,9 @@ function App() {
       const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2);
       const route = new Route([pair], tradetoken1);
       const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
-      console.log("Execution Price:", trade.executionPrice.toSignificant(6));
-      console.log("Mid Price:", route.midPrice.toSignificant(6))
+/*       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
+      console.log("Mid Price:", route.midPrice.toSignificant(6));
+      console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6)); */
       setCurrentTrade(trade);
       setLoading(false);
       return trade.executionPrice.toSignificant(6);
@@ -281,26 +283,35 @@ function App() {
 
   // Handler for Price Estimate button
   const handleEstimatePriceButton = async () => {
-    if(walletnetwork==NETWORK_ID){
+    if(walletnetwork==NETWORK_ID) {
       var ExecutionPrice = await getPrice();
-      if (ExecutionPrice){
+      if (ExecutionPrice) {
         setInputToken2((parseFloat(inputToken1)*parseFloat(ExecutionPrice)).toString());
       }
     }
     else{
-      console.log("Please switch to Rinkeby network")
+      console.log("Please switch to Rinkeby network");
       alert("Please switch to Rinkeby network");
     }
   };
 
+  // Handler to interact with Darkmode switch and store its values
   const handleDarkModeSwitch = (newValue: boolean) => {
-    console.log(newValue)
     setDarkMode(newValue)
   }
 
+  const isReadyToSwap = () => {
+    if((selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)||(balance==undefined)||(parseFloat(inputToken1)>parseFloat(balance)/1000000000000000000)){
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
   const BalanceButton = () => {
-    const handleBalanceButton = () =>{
-      if(balance != null && balance != undefined && selectToken1 == 'WETH'){
+    const handleBalanceButton = () => {
+      if(balance != null && balance != undefined && selectToken1 == 'WETH') {
         setInputToken1((parseFloat(balance)/1000000000000000000).toString())
         setInputToken2(''); // Reset input 2
       }
@@ -360,7 +371,7 @@ function App() {
                     </TextField>
                   </Grid>
                   <Grid item>
-                    <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number"/>
+                    <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number" error={parseFloat(inputToken1)<=0}/>
                   </Grid>
                 </Grid> 
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
@@ -413,10 +424,10 @@ function App() {
         </Grid>
         <Grid item>   
         <ButtonGroup disableElevation variant="contained" color="primary">
-          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
+          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')||(parseFloat(inputToken1)<=0)} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
-          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)} onClick={performTrade}>
+          <Button variant="contained" size="large" color="primary" disabled={!isReadyToSwap()} onClick={performTrade}>
             Swap
           </Button>
         </ButtonGroup>
