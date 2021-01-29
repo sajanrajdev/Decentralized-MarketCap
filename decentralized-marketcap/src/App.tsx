@@ -4,8 +4,8 @@ import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Tokentable';
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
-import { sortTokenList, getTokenBySymbol, toHex, truncateString } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, Switch, CircularProgress, Grid, Box, Slider, Typography, Card, CardContent } from '@material-ui/core';
+import { sortTokenList, getTokenBySymbol, toHex } from './utils';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import ButtonAppBar from './AppBar'
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
@@ -32,6 +32,16 @@ declare global {
 let provider: any;
 let ethereum = window.ethereum;
 
+const styles = {
+  paper: {
+    borderRadius: 3,
+    border: 0,
+    height: 48,
+    padding: '0 30px',
+    boxShadow: '0 5px 5px 5px rgba(244, 21, 125, .3)',
+  },
+};
+const useStyles = makeStyles(styles);
 
 function App() {
   
@@ -70,10 +80,12 @@ function App() {
         main: '#F4157D',
       },
       secondary: {
-        main: '#00695f'
+        main: '#6d1b7b'
       }
     }
   });
+
+  const classes = useStyles();
 
   // On Mount 
   useEffect(() => {
@@ -231,11 +243,13 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
+
   // Handler for Token 1 Input
   const handleInputChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputToken1(event.target.value);
     setInputToken2('');
   };
+
   // Handler for Token 2 Selector
   const handleChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken2(event.target.value);
@@ -244,9 +258,9 @@ function App() {
     setInputToken1('');
     setInputToken2('');
   };
-    // Handler for Deadline input
+
+  // Handler for Deadline input
   const handleInputDeadline = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
     if(event.target.value==''){
       setDeadline('');
     }
@@ -254,19 +268,19 @@ function App() {
       setDeadline(parseFloat(event.target.value).toFixed(0));
     }
   };
-    // Handler for Deadline input
-    const handleInputGasPrice = (event: React.ChangeEvent<HTMLInputElement>) => {
-      console.log(event.target.value)
-      if(event.target.value==''){
-        setGasPrice('');
-      }
-      else{
-        setGasPrice(parseFloat(event.target.value).toFixed(0));
-      }
-    };
+  
+  // Handler for Deadline input
+  const handleInputGasPrice = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if(event.target.value==''){
+      setGasPrice('');
+    }
+    else{
+      setGasPrice(parseFloat(event.target.value).toFixed(0));
+    }
+  };
+
   // Handler for Price Estimate button
   const handleEstimatePriceButton = async () => {
-    console.log(gasprice)
     if(walletnetwork==NETWORK_ID){
       var ExecutionPrice = await getPrice();
       if (ExecutionPrice){
@@ -277,8 +291,12 @@ function App() {
       console.log("Please switch to Rinkeby network")
       alert("Please switch to Rinkeby network");
     }
-
   };
+
+  const handleDarkModeSwitch = (newValue: boolean) => {
+    console.log(newValue)
+    setDarkMode(newValue)
+  }
 
   const BalanceButton = () => {
     const handleBalanceButton = () =>{
@@ -312,7 +330,7 @@ function App() {
     <ThemeProvider theme={mainTheme}>
     <div className="App">
       <Paper>
-      <ButtonAppBar address={address} onboard={onboard} network={walletnetwork}></ButtonAppBar>
+      <ButtonAppBar address={address} onboard={onboard} network={walletnetwork} onChange={handleDarkModeSwitch} darkmode={darkmode}></ButtonAppBar>
       <header>
         <h1>
           Uniswap Remote Trader
@@ -322,7 +340,7 @@ function App() {
       <Container>
       <Grid container spacing={2} direction={'column'} alignItems={'center'}>
         <Grid item>
-          <Paper elevation={3} style={{width: 550, height: 400}}>
+          <Paper className={classes.paper} elevation={3} style={{width: 550, height: 400}}>
             <Box p={1} m={1}>
               <Grid container spacing={2} direction={'column'} alignItems={'center'} justify={'center'}>
                 <Grid item container spacing={2} direction={'row'} alignItems={'center'} justify={'flex-end'}>
@@ -398,7 +416,7 @@ function App() {
           <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')} onClick={handleEstimatePriceButton}>
             Estimate
           </Button>
-          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')} onClick={performTrade}>
+          <Button variant="contained" size="large" color="primary" disabled={(selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)} onClick={performTrade}>
             Swap
           </Button>
         </ButtonGroup>
@@ -407,7 +425,6 @@ function App() {
       <br/>
         <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
       </Container>
-      <Switch color="secondary" onChange={() => setDarkMode(!darkmode)}></Switch>
       <div >© 2021 Sajan Rajdev. All Rights Reserved.</div>
       <br/>
     </Paper>

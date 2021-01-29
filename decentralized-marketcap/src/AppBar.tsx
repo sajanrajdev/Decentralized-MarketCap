@@ -4,7 +4,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import {IconButton} from '@material-ui/core';
+import {IconButton, Switch} from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import {truncateString, networkName} from './utils';
 
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function ButtonAppBar({address, onboard, network}:{address: any | any[] , onboard: any, network: any}) {
+export default function ButtonAppBar({address, onboard, network, onChange, darkmode}:{address: any | any[] , onboard: any, network: any, onChange: any, darkmode:boolean}) {
   const classes = useStyles();
   const [buttonstatus, setButtonStatus] = useState<string | null>('Connect Wallet');
 
@@ -37,14 +37,24 @@ export default function ButtonAppBar({address, onboard, network}:{address: any |
     }
   }, [onboard])
 
+  const handleDarkModeSwitch = () => {
+    if(darkmode){
+      onChange(false);
+    }
+    else{
+      onChange(true);
+    }
+  }
+
   return (
     <div className={classes.root}>
 
       <AppBar position="static">
         <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+{/*           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
+          <Switch color="secondary" onChange={handleDarkModeSwitch}></Switch>
           <Typography variant="button" className={classes.title}> 
           </Typography>
           <Button color="primary" variant="contained">{networkName(network)}</Button>
