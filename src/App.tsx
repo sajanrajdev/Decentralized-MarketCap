@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import './App.css';
 import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Components/Tokentable';
@@ -54,12 +53,13 @@ function App() {
   const [selectToken2, setSelectToken2] = useState('');
   const [inputToken1, setInputToken1] = useState('');
   const [inputToken2, setInputToken2] = useState('');
-  const [darkmode, setDarkMode] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
   const [currentTrade, setCurrentTrade] = useState<Trade>();
   const [tolerance, setTolerance] = useState<any>(0.5);
   const [deadline, setDeadline] = useState<string>('20');
   const [gasprice, setGasPrice] = useState<string>('20');
+
+  const [darkmode, setDarkMode] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [address, setAddress] = useState(null);
   const [walletnetwork, setWalletNetwork] = useState<number>();
@@ -82,6 +82,10 @@ function App() {
       secondary: {
         main: '#6d1b7b'
       }
+    },
+    typography: {
+      "fontFamily": `"Roboto", "Helvetica", "Arial", "sans-serifSegoe UI", "Oxygen",
+      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue"`
     }
   });
 
@@ -341,11 +345,13 @@ function App() {
     <div className="App">
       <Paper>
       <ButtonAppBar address={address} onboard={onboard} network={walletnetwork} onChange={handleDarkModeSwitch} darkmode={darkmode}></ButtonAppBar>
+      <br/>
       <header>
-        <h1>
+        <Typography variant='h3' align="center">
           Uniswap Remote Trader
-        </h1>
+        </Typography>  
       </header>
+      <br/>
       <NetowrkChange walletnetowrk={walletnetwork}></NetowrkChange>
       <Container>
       <Grid container spacing={2} direction={'column'} alignItems={'center'}>

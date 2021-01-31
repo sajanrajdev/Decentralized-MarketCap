@@ -11,7 +11,6 @@ export function initOnboard(subscriptions: any) {
     dappId,
     hideBranding: false,
     networkId,
-    // darkMode: true,
     subscriptions,
     walletSelect: {
       wallets: [

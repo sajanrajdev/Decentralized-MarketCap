@@ -50,9 +50,6 @@ export default function ButtonAppBar({address, onboard, network, onChange, darkm
 
       <AppBar position="static">
         <Toolbar>
-{/*           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton> */}
           <Switch color="secondary" onChange={handleDarkModeSwitch}></Switch>
           <Typography variant="button" className={classes.title}> 
           </Typography>
