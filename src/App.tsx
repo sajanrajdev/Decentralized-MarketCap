@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Components/Tokentable';
-import ButtonAppBar from './Components/AppBar'
+import TopAppBar from './Components/AppBar'
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
 import { sortTokenList, getTokenBySymbol, toHex } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup } from '@material-ui/core';
+import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@material-ui/core';
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
@@ -80,7 +80,7 @@ function App() {
         main: '#F4157D',
       },
       secondary: {
-        main: '#6d1b7b'
+        main: '#8f0b49'
       }
     },
     typography: {
@@ -315,8 +315,13 @@ function App() {
   const BalanceButton = () => {
     const handleBalanceButton = () => {
       if(balance != null && balance != undefined && selectToken1 == 'WETH') {
-        setInputToken1((parseFloat(balance)/1000000000000000000).toString())
-        setInputToken2(''); // Reset input 2
+        if((parseFloat(balance)/1000000000000000000) > 0.01){
+          setInputToken1(((parseFloat(balance)/1000000000000000000)-0.01).toString()) // Max input - 0.01 to account for gas usage
+          setInputToken2(''); // Reset input 2
+        }
+        else{
+          alert("Insufficient balance!")
+        }
       }
     }
     return(
@@ -342,9 +347,9 @@ function App() {
 
   return (
     <ThemeProvider theme={mainTheme}>
-    <div className="App">
+    <div className="App" data-testid="App">
       <Paper>
-      <ButtonAppBar address={address} onboard={onboard} network={walletnetwork} onChange={handleDarkModeSwitch} darkmode={darkmode}></ButtonAppBar>
+      <TopAppBar address={address} onboard={onboard} network={walletnetwork} onChange={handleDarkModeSwitch} darkmode={darkmode}></TopAppBar>
       <br/>
       <header>
         <Typography variant='h3' align="center">
@@ -441,7 +446,12 @@ function App() {
       <br/>
         <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
       </Container>
-      <div >© 2021 Sajan Rajdev. All Rights Reserved.</div>
+      <br/>
+      <div >
+          <Typography variant='body2' align="center">
+            © 2021 Sajan Rajdev. All Rights Reserved.
+          </Typography> 
+      </div>
       <br/>
     </Paper>
     </div>

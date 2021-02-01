@@ -4,8 +4,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import {Switch} from '@material-ui/core';
-import {truncateString, networkName} from '../utils';
+import {Switch, Grid} from '@material-ui/core';
+import {truncateAddress, networkName} from '../utils';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function ButtonAppBar({address, onboard, network, onChange, darkmode}:{address: any | any[] , onboard: any, network: any, onChange: any, darkmode:boolean}) {
+export default function TopAppBar({address, onboard, network, onChange, darkmode}:{address: any | any[] , onboard: any, network: any, onChange: any, darkmode:boolean}) {
   const classes = useStyles();
   const [buttonstatus, setButtonStatus] = useState<string | null>('Connect Wallet');
 
@@ -53,9 +53,10 @@ export default function ButtonAppBar({address, onboard, network, onChange, darkm
           <Switch color="secondary" onChange={handleDarkModeSwitch}></Switch>
           <Typography variant="button" className={classes.title}> 
           </Typography>
-          <Button color="primary" variant="contained">{networkName(network)}</Button>
-          {address && <Button color="primary" variant="contained">{truncateString(address, 6)}</Button>}
-          <Button color="primary" variant="contained" onClick={ async () => {
+          <Grid container spacing={1} direction={'row'} alignItems={'center'} justify={'flex-end'}>
+            <Grid item><Button color="secondary" variant="outlined" style={{ border: '2px solid' }}><b>{networkName(network)}</b></Button></Grid>
+            <Grid item>{address && <Button color="secondary" variant="outlined" style={{ border: '2px solid' }}><b>{truncateAddress(address)}</b></Button>}</Grid>
+            <Grid item><Button color="secondary" variant="contained" onClick={ async () => {
               if(buttonstatus == 'Connect Wallet'){
                 setButtonStatus('Disconnect Wallet');
                 await onboard.walletSelect()
@@ -65,7 +66,8 @@ export default function ButtonAppBar({address, onboard, network, onChange, darkm
                 setButtonStatus('Connect Wallet');
                 onboard.walletReset();
               }
-            }}>{buttonstatus}</Button>
+            }}>{buttonstatus}</Button></Grid>
+          </Grid>
         </Toolbar>
       </AppBar>
     </div>

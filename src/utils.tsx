@@ -33,6 +33,14 @@
     return str.slice(0, num) + '...'
   }
 
+    // Function to truncate a string to a certain length
+    const truncateAddress = (str: string | null) => {
+      if(str == null){
+          return null
+      }
+      return str.slice(0, 6) + '...' + str.slice(str.length - 4, str.length)
+    }
+
   // Function to sort calculate the prices and totalLiquidity in USD and sort the token list in terms of this last one
   const sortTokenList = (tokenslist: any[], ethPrice: number) => {
     var sortedItems = tokenslist.map(
@@ -114,4 +122,5 @@
     getTokenBySymbol, 
     getTokensByID, 
     toHex, 
-    networkName}
+    networkName, 
+    truncateAddress}
