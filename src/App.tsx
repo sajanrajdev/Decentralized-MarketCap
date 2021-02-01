@@ -4,11 +4,12 @@ import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap
 import Tokentable from './Components/Tokentable';
 import TopAppBar from './Components/AppBar'
 import { ETHER_PRICE, ALL_TOKENS } from './queries'
-import { sortTokenList, getTokenBySymbol, toHex } from './utils';
+import { sortTokenList, getTokenBySymbol, toHex, networkName } from './utils';
 import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@material-ui/core';
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
+import BigNumber from 'bignumber.js'
 import Notify, { APIN } from 'bnc-notify'
 import { initOnboard, initNotify } from './Components/Blocknative'
 import { API } from "bnc-onboard/dist/src/interfaces";
@@ -146,63 +147,64 @@ function App() {
     else false;
   }
 
-  // Get realtime price of token1 based on paired token2
-  const getPrice = async () => {
-    if(walletnetwork == NETWORK_ID){
-      setLoading(true);
-      const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token1.address)); 
-      const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address));
-      const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2);
-      const route = new Route([pair], tradetoken1);
-      const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
-/*       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
-      console.log("Mid Price:", route.midPrice.toSignificant(6));
-      console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6)); */
-      setCurrentTrade(trade);
-      setLoading(false);
-      return trade.executionPrice.toSignificant(6);
-    }
-    else{
-      console.log("Please switch to Rinkeby network");
-    }
-  }
-
-  const performTrade = async () => {
-    if(currentTrade != undefined && readyToTransact()){
-      const slippageTolerance = new Percent((tolerance*100).toString(), '10000');
-      const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
-      const path = [ethers.utils.getAddress(token1.address), ethers.utils.getAddress(token2.address)];
-      const to = address; // Sends to selected address on wallet
-      const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
-      const value = toHex(currentTrade.inputAmount.raw);
-      const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
-      const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
-
-      const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value, gasPrice: parseInt(gasprice)*WEI_TO_GWEI});
-      console.log('Transaction Hash:',tx.hash);
-
-      if (notify != undefined){
-        const { emitter } = notify.hash(tx.hash);
-        emitter.on('txPool', tx => {
-          return {
-            onclick: () =>
-              window.open(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
-          }
-        });
-        emitter.on('txSent', console.log);
-        emitter.on('txConfirmed', console.log);
-        emitter.on('txSpeedUp', console.log);
-        emitter.on('txCancel', console.log);
-        emitter.on('txFailed', console.log);
+    // Get realtime price of token1 based on paired token2
+    const getPrice = async () => {
+      if(walletnetwork == NETWORK_ID){
+        setLoading(true);
+        const tradeprovider = new ethers.providers.InfuraWebSocketProvider(networkName(walletnetwork), {infura: 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'})
+        const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token1.address), tradeprovider); 
+        const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address), tradeprovider);
+        const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, tradeprovider);
+        const route = new Route([pair], tradetoken1);
+        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
+  /*       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
+        console.log("Mid Price:", route.midPrice.toSignificant(6));
+        console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6)); */
+        setCurrentTrade(trade);
+        setLoading(false);
+        return trade.executionPrice.toSignificant(6);
       }
-
-      const receipt = await tx.wait();
-      console.log("Transaction was mined in block:", receipt.blockNumber);
+      else{
+        console.log("Please switch to Rinkeby network");
+      }
     }
-    else{
-      console.log("Current Trade not defined")
+  
+    const performTrade = async () => {
+      if(currentTrade != undefined && readyToTransact()){
+        const slippageTolerance = new Percent((tolerance*100).toString(), '10000');
+        const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
+        const path = [ethers.utils.getAddress(token1.address), ethers.utils.getAddress(token2.address)];
+        const to = address; // Sends to selected address on wallet
+        const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
+        const value = toHex(currentTrade.inputAmount.raw);
+        const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
+        const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
+  
+        const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value, gasPrice: parseInt(gasprice)*WEI_TO_GWEI});
+        console.log('Transaction Hash:',tx.hash);
+  
+        if (notify != undefined){
+          const { emitter } = notify.hash(tx.hash);
+          emitter.on('txPool', (tx: any) => {
+            return {
+              onclick: () =>
+                window.open(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
+            }
+          });
+          emitter.on('txSent', console.log);
+          emitter.on('txConfirmed', console.log);
+          emitter.on('txSpeedUp', console.log);
+          emitter.on('txCancel', console.log);
+          emitter.on('txFailed', console.log);
+        }
+  
+        const receipt = await tx.wait();
+        console.log("Transaction was mined in block:", receipt.blockNumber);
+      }
+      else{
+        console.log("Current Trade not defined")
+      }
     }
-  }
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
