@@ -3,17 +3,17 @@ import { ApolloClient, InMemoryCache} from '@apollo/client';
 import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap/sdk'
 import Tokentable from './Components/Tokentable';
 import TopAppBar from './Components/AppBar'
-import { ETHER_PRICE, ALL_TOKENS } from './queries'
+import { ETHER_PRICE, ALL_TOKENS } from './Data/queries'
 import { sortTokenList, getTokenBySymbol, toHex, networkName } from './utils';
 import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@material-ui/core';
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
-import BigNumber from 'bignumber.js'
 import Notify, { APIN } from 'bnc-notify'
-import { initOnboard, initNotify } from './Components/Blocknative'
+import { initOnboard, initNotify } from './Services/Blocknative'
 import { API } from "bnc-onboard/dist/src/interfaces";
-import { RinkebyTokens } from "./RinkbeyTokens"
+import { RinkebyTokens } from './Data/RinkbeyTokens'
+import BalanceButton from './Components/BalanceButton'
 
 
 interface TradeToken {
@@ -229,19 +229,6 @@ function App() {
     return(null);
   }
 
-  // Handle network change from user's wallet
-  const NetowrkChange = (walletnetwork: any) => {
-    if(walletnetwork == 4){
-      setTokensList(RinkebyTokens);
-      console.log(RinkebyTokens)
-    }
-    else if(walletnetwork == 1){
-      setTokensList(maintokenslist);
-      console.log(maintokenslist)
-    }
-    return null;
-  }
-
   // Handler for Token 1 Selector
   const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectToken1(event.target.value);
@@ -312,39 +299,7 @@ function App() {
     else {
       return true;
     }
-  }
-
-  const BalanceButton = () => {
-    const handleBalanceButton = () => {
-      if(balance != null && balance != undefined && selectToken1 == 'WETH') {
-        if((parseFloat(balance)/1000000000000000000) > 0.01){
-          setInputToken1(((parseFloat(balance)/1000000000000000000)-0.01).toString()) // Max input - 0.01 to account for gas usage
-          setInputToken2(''); // Reset input 2
-        }
-        else{
-          alert("Insufficient balance!")
-        }
-      }
-    }
-    return(
-      <div>
-      {wallet && (balance != null && balance != undefined) ? (
-        <div>
-          <Button variant="outlined" color="primary" onClick={handleBalanceButton}>
-            <div>MAX</div>
-          </Button>
-        </div>
-      ) : (
-        <div>
-          <Button variant="outlined" color="primary" disabled>
-            <div>MAX</div>
-          </Button>
-        </div>
-      )}
-      <br/>
-      </div>
-    )
-  }
+  }  
   
 
   return (
@@ -359,7 +314,6 @@ function App() {
         </Typography>  
       </header>
       <br/>
-      <NetowrkChange walletnetowrk={walletnetwork}></NetowrkChange>
       <Container>
       <Grid container spacing={2} direction={'column'} alignItems={'center'}>
         <Grid item>
@@ -371,8 +325,8 @@ function App() {
                     {balance ? `Balance: ${(parseFloat(balance)/1000000000000000000).toFixed(6).toString()} ETH` : 'Balance:'}
                   </Grid> 
                   <Grid item>
-                    <BalanceButton></BalanceButton>
-                  </Grid>
+                    <BalanceButton balance={balance} selectToken1={selectToken1} wallet={wallet} setInputToken1={setInputToken1} setInputToken2={setInputToken2}></BalanceButton>
+                   </Grid>
                 </Grid>
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>

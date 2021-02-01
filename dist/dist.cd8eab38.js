@@ -3668,6 +3668,7 @@ var Buffer = require("buffer").Buffer;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.RegExpString = exports.IntNumber = exports.BigIntString = exports.AddressString = exports.HexString = exports.OpaqueType = void 0;
 
 function OpaqueType() {
   return value => value;
@@ -3699,6 +3700,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getFavicon = exports.range = exports.isBigNumber = exports.ensureParsedJSONObject = exports.ensureBN = exports.ensureRegExpString = exports.ensureIntNumber = exports.ensureBuffer = exports.ensureAddressString = exports.ensureEvenLengthHexString = exports.ensureHexString = exports.isHexString = exports.prepend0x = exports.strip0x = exports.has0xPrefix = exports.hexStringFromIntNumber = exports.intNumberFromHexString = exports.bigIntStringFromBN = exports.hexStringFromBuffer = void 0;
 
 const bn_js_1 = __importDefault(require("bn.js"));
 
@@ -3881,6 +3883,20 @@ function ensureBN(val) {
 }
 
 exports.ensureBN = ensureBN;
+
+function ensureParsedJSONObject(val) {
+  if (typeof val === "string") {
+    return JSON.parse(val);
+  }
+
+  if (typeof val === "object") {
+    return val;
+  }
+
+  throw new Error(`Not a JSON string or an object: ${val}`);
+}
+
+exports.ensureParsedJSONObject = ensureParsedJSONObject;
 
 function isBigNumber(val) {
   if (val == null || typeof val.constructor !== "function") {
@@ -5109,6 +5125,7 @@ function typedSignatureHashLegacy(typedData) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.filterFromParam = exports.FilterPolyfill = void 0;
 
 const types_1 = require("../types");
 
@@ -5419,6 +5436,7 @@ function emptyResult() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.JSONRPCMethod = void 0;
 var JSONRPCMethod;
 
 (function (JSONRPCMethod) {
@@ -5457,6 +5475,7 @@ var JSONRPCMethod;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ProviderError = exports.ProviderErrorCode = void 0;
 var ProviderErrorCode;
 
 (function (ProviderErrorCode) {
@@ -5494,6 +5513,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.WalletLinkProvider = void 0;
 
 const bn_js_1 = __importDefault(require("bn.js"));
 
@@ -6062,7 +6082,7 @@ class WalletLinkProvider {
   async _eth_signTypedData_v1(params) {
     this._requireAuthorization();
 
-    const typedData = params[0];
+    const typedData = util_1.ensureParsedJSONObject(params[0]);
     const address = util_1.ensureAddressString(params[1]);
 
     this._ensureKnownAddress(address);
@@ -6070,38 +6090,38 @@ class WalletLinkProvider {
     const message = eth_eip712_util_1.default.hashForSignTypedDataLegacy({
       data: typedData
     });
-    const typedDataJson = JSON.stringify(typedData, null, 2);
-    return this._signEthereumMessage(message, address, false, typedDataJson);
+    const typedDataJSON = JSON.stringify(typedData, null, 2);
+    return this._signEthereumMessage(message, address, false, typedDataJSON);
   }
 
   async _eth_signTypedData_v3(params) {
     this._requireAuthorization();
 
     const address = util_1.ensureAddressString(params[0]);
-    const typedData = params[1];
+    const typedData = util_1.ensureParsedJSONObject(params[1]);
 
     this._ensureKnownAddress(address);
 
     const message = eth_eip712_util_1.default.hashForSignTypedData_v3({
       data: typedData
     });
-    const typedDataJson = JSON.stringify(typedData, null, 2);
-    return this._signEthereumMessage(message, address, false, typedDataJson);
+    const typedDataJSON = JSON.stringify(typedData, null, 2);
+    return this._signEthereumMessage(message, address, false, typedDataJSON);
   }
 
   async _eth_signTypedData_v4(params) {
     this._requireAuthorization();
 
     const address = util_1.ensureAddressString(params[0]);
-    const typedData = params[1];
+    const typedData = util_1.ensureParsedJSONObject(params[1]);
 
     this._ensureKnownAddress(address);
 
     const message = eth_eip712_util_1.default.hashForSignTypedData_v4({
       data: typedData
     });
-    const typedDataJson = JSON.stringify(typedData, null, 2);
-    return this._signEthereumMessage(message, address, false, typedDataJson);
+    const typedDataJSON = JSON.stringify(typedData, null, 2);
+    return this._signEthereumMessage(message, address, false, typedDataJSON);
   }
 
   async _walletlink_arbitrary(params) {
@@ -6188,6 +6208,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.injectCssReset = void 0;
 
 const cssReset_css_1 = __importDefault(require("./cssReset-css"));
 
@@ -22351,6 +22372,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.QRCode = void 0;
 
 const preact_1 = require("preact");
 
@@ -22404,6 +22426,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Spinner = void 0;
 
 const preact_1 = require("preact");
 
@@ -22446,6 +22469,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LinkDialog = void 0;
 
 const clsx_1 = __importDefault(require("clsx"));
 
@@ -22548,6 +22572,7 @@ const CancelButton = props => preact_1.h("button", {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LinkFlow = void 0;
 
 const preact_1 = require("preact");
 
@@ -22650,6 +22675,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Snackbar = void 0;
 
 const clsx_1 = __importDefault(require("clsx"));
 
@@ -22765,6 +22791,7 @@ const SnackbarItem = ({
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ClientMessagePublishEvent = exports.ClientMessageSetSessionConfig = exports.ClientMessageGetSessionConfig = exports.ClientMessageIsLinked = exports.ClientMessageHostSession = void 0;
 
 function ClientMessageHostSession(params) {
   return Object.assign({
@@ -22813,6 +22840,7 @@ exports.ClientMessagePublishEvent = ClientMessagePublishEvent;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.RxWebSocket = exports.ConnectionState = void 0;
 
 const rxjs_1 = require("rxjs");
 
@@ -22986,6 +23014,7 @@ exports.RxWebSocket = RxWebSocket;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.isServerMessageFail = void 0;
 
 function isServerMessageFail(msg) {
   return msg && msg.type === "Fail" && typeof msg.id === "number" && typeof msg.sessionId === "string" && typeof msg.error === "string";
@@ -23000,6 +23029,7 @@ exports.isServerMessageFail = isServerMessageFail;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.WalletLinkConnection = void 0;
 
 const rxjs_1 = require("rxjs");
 
@@ -23278,6 +23308,7 @@ exports.WalletLinkConnection = WalletLinkConnection;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ScopedLocalStorage = void 0;
 
 class ScopedLocalStorage {
   constructor(scope) {
@@ -23333,6 +23364,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.decrypt = exports.encrypt = void 0;
 
 const crypto_1 = __importDefault(require("crypto"));
 
@@ -23370,6 +23402,7 @@ var __importDefault = this && this.__importDefault || function (mod) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Session = void 0;
 
 const crypto_1 = __importDefault(require("crypto"));
 
@@ -23460,6 +23493,7 @@ exports.Session = Session;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Web3Method = void 0;
 var Web3Method;
 
 (function (Web3Method) {
@@ -23479,6 +23513,7 @@ var Web3Method;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.RelayMessageType = void 0;
 var RelayMessageType;
 
 (function (RelayMessageType) {
@@ -23498,6 +23533,7 @@ var RelayMessageType;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Web3RequestCanceledMessage = void 0;
 
 const RelayMessage_1 = require("./RelayMessage");
 
@@ -23517,6 +23553,7 @@ exports.Web3RequestCanceledMessage = Web3RequestCanceledMessage;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Web3RequestMessage = void 0;
 
 const RelayMessage_1 = require("./RelayMessage");
 
@@ -23535,6 +23572,7 @@ exports.Web3RequestMessage = Web3RequestMessage;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.isRequestEthereumAccountsResponse = exports.RequestEthereumAccountsResponse = exports.ErrorResponse = void 0;
 
 const Web3Method_1 = require("./Web3Method");
 
@@ -23569,6 +23607,7 @@ exports.isRequestEthereumAccountsResponse = isRequestEthereumAccountsResponse;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.isWeb3ResponseMessage = exports.Web3ResponseMessage = void 0;
 
 const RelayMessage_1 = require("./RelayMessage");
 
@@ -23590,6 +23629,28 @@ exports.isWeb3ResponseMessage = isWeb3ResponseMessage;
 // Copyright (c) 2018-2020 Coinbase, Inc. <https://www.coinbase.com/>
 // Licensed under the Apache License, version 2.0
 
+var __createBinding = this && this.__createBinding || (Object.create ? function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  Object.defineProperty(o, k2, {
+    enumerable: true,
+    get: function () {
+      return m[k];
+    }
+  });
+} : function (o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+var __setModuleDefault = this && this.__setModuleDefault || (Object.create ? function (o, v) {
+  Object.defineProperty(o, "default", {
+    enumerable: true,
+    value: v
+  });
+} : function (o, v) {
+  o["default"] = v;
+});
+
 var __decorate = this && this.__decorate || function (decorators, target, key, desc) {
   var c = arguments.length,
       r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
@@ -23598,23 +23659,26 @@ var __decorate = this && this.__decorate || function (decorators, target, key, d
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
+var __importStar = this && this.__importStar || function (mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+
+  __setModuleDefault(result, mod);
+
+  return result;
+};
+
 var __importDefault = this && this.__importDefault || function (mod) {
   return mod && mod.__esModule ? mod : {
     "default": mod
   };
 };
 
-var __importStar = this && this.__importStar || function (mod) {
-  if (mod && mod.__esModule) return mod;
-  var result = {};
-  if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-  result["default"] = mod;
-  return result;
-};
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.WalletLinkRelay = void 0;
 
 const bind_decorator_1 = __importDefault(require("bind-decorator"));
 
@@ -23947,7 +24011,7 @@ exports.WalletLinkRelay = WalletLinkRelay;
 },{"bind-decorator":"../node_modules/bind-decorator/index.js","crypto":"../node_modules/crypto-browserify/index.js","rxjs":"../node_modules/rxjs/_esm5/index.js","rxjs/operators":"../node_modules/rxjs/_esm5/operators/index.js","url":"../node_modules/url/url.js","../components/LinkFlow":"../node_modules/walletlink/dist/components/LinkFlow.js","../components/Snackbar":"../node_modules/walletlink/dist/components/Snackbar.js","../connection/WalletLinkConnection":"../node_modules/walletlink/dist/connection/WalletLinkConnection.js","../lib/ScopedLocalStorage":"../node_modules/walletlink/dist/lib/ScopedLocalStorage.js","../util":"../node_modules/walletlink/dist/util.js","./aes256gcm":"../node_modules/walletlink/dist/relay/aes256gcm.js","./Session":"../node_modules/walletlink/dist/relay/Session.js","./Web3Method":"../node_modules/walletlink/dist/relay/Web3Method.js","./Web3RequestCanceledMessage":"../node_modules/walletlink/dist/relay/Web3RequestCanceledMessage.js","./Web3RequestMessage":"../node_modules/walletlink/dist/relay/Web3RequestMessage.js","./Web3Response":"../node_modules/walletlink/dist/relay/Web3Response.js","./Web3ResponseMessage":"../node_modules/walletlink/dist/relay/Web3ResponseMessage.js"}],"../node_modules/walletlink/package.json":[function(require,module,exports) {
 module.exports = {
   "name": "walletlink",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "WalletLink JavaScript SDK",
   "keywords": ["cipher", "cipherbrowser", "coinbase", "coinbasewallet", "eth", "ether", "ethereum", "etherium", "injection", "toshi", "wallet", "walletlink", "web3"],
   "main": "dist/index.js",
@@ -23964,7 +24028,7 @@ module.exports = {
     "build-npm": "tsc -p ./tsconfig.build.json",
     "build:dev": "export WALLETLINK_URL='http://localhost:3000'; yarn build && yarn build-chrome",
     "build:dev:watch": "nodemon -e 'ts,tsx,js,json,css,scss,svg' --ignore 'src/**/*-css.ts' --ignore 'src/**/*-svg.ts' --watch src/ --watch chrome/ --exec 'yarn build:dev'",
-    "build:prod": "yarn build && yarn build-chrome && yarn build-npm && cp ./package.json ../README.md ../LICENSE build/npm && cp -a src/vendor-js build/npm/dist && sed -i '' 's|  \"private\": true,||g' build/npm/package.json",
+    "build:prod": "yarn build && yarn build-chrome && yarn build-npm && cp ./package.json ../README.md ../LICENSE build/npm && cp -a src/vendor-js build/npm/dist && sed -i.bak 's|  \"private\": true,||g' build/npm/package.json && rm -f build/npm/package.json.bak",
     "lint": "tslint -p . 'src/**/*.ts{,x}'",
     "lint:watch": "nodemon -e ts,tsx,js,json,css,scss,svg --watch src/ --exec 'yarn tsc && yarn lint'"
   },
@@ -23972,34 +24036,33 @@ module.exports = {
     "bind-decorator": "^1.0.11",
     "bn.js": "^5.1.1",
     "clsx": "^1.1.0",
-    "preact": "^10.3.3",
-    "rxjs": "^6.5.4"
+    "preact": "^10.5.9",
+    "rxjs": "^6.6.3"
   },
   "devDependencies": {
     "@types/bn.js": "^4.11.6",
-    "@types/jest": "^25.1.3",
-    "@types/node": "^13.7.7",
-    "copy-webpack-plugin": "^5.1.1",
-    "core-js": "^3.6.4",
-    "glob": "^7.1.6",
-    "jest": "^25.1.0",
-    "nodemon": "^2.0.2",
-    "raw-loader": "^4.0.0",
-    "regenerator-runtime": "^0.13.3",
+    "@types/jest": "^26.0.19",
+    "@types/node": "^14.14.20",
+    "copy-webpack-plugin": "^6.4.1",
+    "core-js": "^3.8.2",
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "raw-loader": "^4.0.2",
+    "regenerator-runtime": "^0.13.7",
     "rxjs-tslint": "^0.1.7",
-    "sass": "^1.26.2",
+    "sass": "^1.32.0",
     "svgo": "^1.3.2",
-    "ts-jest": "^25.2.1",
-    "ts-loader": "^6.2.1",
-    "tslib": "^1.11.1",
-    "tslint": "^6.0.0",
+    "ts-jest": "^26.4.4",
+    "ts-loader": "^8.0.13",
+    "tslib": "^2.0.3",
+    "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-security": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.8.3",
-    "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11",
-    "whatwg-fetch": "^3.0.0"
+    "typescript": "^4.1.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "whatwg-fetch": "^3.5.0"
   },
   "engines": {
     "node": ">= 10.0.0"
@@ -24022,6 +24085,7 @@ module.exports = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.WalletLink = void 0;
 
 const cssReset_1 = require("./lib/cssReset");
 
@@ -24114,11 +24178,21 @@ const WalletLink_1 = require("./WalletLink");
 
 var WalletLinkProvider_2 = require("./provider/WalletLinkProvider");
 
-exports.WalletLinkProvider = WalletLinkProvider_2.WalletLinkProvider;
+Object.defineProperty(exports, "WalletLinkProvider", {
+  enumerable: true,
+  get: function () {
+    return WalletLinkProvider_2.WalletLinkProvider;
+  }
+});
 
 var WalletLink_2 = require("./WalletLink");
 
-exports.WalletLink = WalletLink_2.WalletLink;
+Object.defineProperty(exports, "WalletLink", {
+  enumerable: true,
+  get: function () {
+    return WalletLink_2.WalletLink;
+  }
+});
 exports.default = WalletLink_1.WalletLink;
 
 if (typeof window !== "undefined") {
@@ -24153,7 +24227,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50285" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55467" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
