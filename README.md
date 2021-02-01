@@ -5,6 +5,7 @@ The purpose of the development of this project was to test several tools and tec
 - Uniswap SDK
 - Uniswap API
 - Ethers.js
+- Infura
 - Material-ui.js
 - Onboard.js (By Blocknative)
 - Notify.js (By Blocknative)
