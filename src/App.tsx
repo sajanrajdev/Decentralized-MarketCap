@@ -31,18 +31,6 @@ declare global {
 let provider: any;
 let ethereum = window.ethereum;
 
-const styles = {
-  paper: {
-    borderRadius: 26,
-    background: '#181a1c',
-    border: 0,
-    height: 48,
-    padding: '0 30px',
-    square: false
-  },
-};
-const useStyles = makeStyles(styles);
-
 function App() {
   
   const [etherPrice, setEtherPrice] = useState<number>(0);
@@ -98,8 +86,8 @@ function App() {
       square: false
     },
   };
-  const useStyles = makeStyles(styles);
 
+  const useStyles = makeStyles(styles);
   const classes = useStyles();
 
   // On Mount 
@@ -353,7 +341,7 @@ function App() {
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
                     <TextField data-testid="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
-                      {tokenslist.slice(1, 3).map((option: any | any[]) => (
+                      {tokenslist.slice(1, tokenslist.length).map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}
                         </MenuItem>
