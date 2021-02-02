@@ -9,7 +9,7 @@ import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@m
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
-import Notify, { APIN } from 'bnc-notify'
+import Notify from 'bnc-notify'
 import { initOnboard, initNotify } from './Services/Blocknative'
 import { API } from "bnc-onboard/dist/src/interfaces";
 import { RinkebyTokens } from './Data/RinkbeyTokens'
@@ -68,7 +68,7 @@ function App() {
   const [wallet, setWallet] = useState({});
 
   const [onboard, setOnboard] = useState<API>()
-  const [notify, setNotify] = useState<APIN>()
+  const [notify, setNotify] = useState<any>()
 
   const NETWORK_ID = 4; // Working network, to be selectable in the future (Mainnet 1, Ropsten 3 and Rinkeby 4)
   const WEI_TO_ETH = 1000000000000000000;
@@ -330,19 +330,19 @@ function App() {
                 </Grid>
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
-                    <TextField id="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
+                    <TextField data-testid="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
                         <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
                           {tokenslist[0].symbol} 
                         </MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item>
-                    <TextField id="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number" error={parseFloat(inputToken1)<=0}/>
+                    <TextField data-testid="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number" error={parseFloat(inputToken1)<=0}/>
                   </Grid>
                 </Grid> 
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
-                    <TextField id="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
+                    <TextField data-testid="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
                       {tokenslist.slice(1, 3).map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}

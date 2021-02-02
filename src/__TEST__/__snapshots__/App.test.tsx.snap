@@ -1,0 +1,620 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly enzyme 1`] = `
+<ThemeProvider
+  theme={
+    Object {
+      "breakpoints": Object {
+        "between": [Function],
+        "down": [Function],
+        "keys": Array [
+          "xs",
+          "sm",
+          "md",
+          "lg",
+          "xl",
+        ],
+        "only": [Function],
+        "up": [Function],
+        "values": Object {
+          "lg": 1280,
+          "md": 960,
+          "sm": 600,
+          "xl": 1920,
+          "xs": 0,
+        },
+        "width": [Function],
+      },
+      "direction": "ltr",
+      "mixins": Object {
+        "gutters": [Function],
+        "toolbar": Object {
+          "@media (min-width:0px) and (orientation: landscape)": Object {
+            "minHeight": 48,
+          },
+          "@media (min-width:600px)": Object {
+            "minHeight": 64,
+          },
+          "minHeight": 56,
+        },
+      },
+      "overrides": Object {},
+      "palette": Object {
+        "action": Object {
+          "activatedOpacity": 0.24,
+          "active": "#fff",
+          "disabled": "rgba(255, 255, 255, 0.3)",
+          "disabledBackground": "rgba(255, 255, 255, 0.12)",
+          "disabledOpacity": 0.38,
+          "focus": "rgba(255, 255, 255, 0.12)",
+          "focusOpacity": 0.12,
+          "hover": "rgba(255, 255, 255, 0.08)",
+          "hoverOpacity": 0.08,
+          "selected": "rgba(255, 255, 255, 0.16)",
+          "selectedOpacity": 0.16,
+        },
+        "augmentColor": [Function],
+        "background": Object {
+          "default": "#303030",
+          "paper": "#424242",
+        },
+        "common": Object {
+          "black": "#000",
+          "white": "#fff",
+        },
+        "contrastThreshold": 3,
+        "divider": "rgba(255, 255, 255, 0.12)",
+        "error": Object {
+          "contrastText": "#fff",
+          "dark": "#d32f2f",
+          "light": "#e57373",
+          "main": "#f44336",
+        },
+        "getContrastText": [Function],
+        "grey": Object {
+          "100": "#f5f5f5",
+          "200": "#eeeeee",
+          "300": "#e0e0e0",
+          "400": "#bdbdbd",
+          "50": "#fafafa",
+          "500": "#9e9e9e",
+          "600": "#757575",
+          "700": "#616161",
+          "800": "#424242",
+          "900": "#212121",
+          "A100": "#d5d5d5",
+          "A200": "#aaaaaa",
+          "A400": "#303030",
+          "A700": "#616161",
+        },
+        "info": Object {
+          "contrastText": "#fff",
+          "dark": "#1976d2",
+          "light": "#64b5f6",
+          "main": "#2196f3",
+        },
+        "primary": Object {
+          "contrastText": "#fff",
+          "dark": "rgb(170, 14, 87)",
+          "light": "rgb(246, 67, 151)",
+          "main": "#F4157D",
+        },
+        "secondary": Object {
+          "contrastText": "#fff",
+          "dark": "rgb(100, 7, 51)",
+          "light": "rgb(165, 59, 109)",
+          "main": "#8f0b49",
+        },
+        "success": Object {
+          "contrastText": "rgba(0, 0, 0, 0.87)",
+          "dark": "#388e3c",
+          "light": "#81c784",
+          "main": "#4caf50",
+        },
+        "text": Object {
+          "disabled": "rgba(255, 255, 255, 0.5)",
+          "hint": "rgba(255, 255, 255, 0.5)",
+          "icon": "rgba(255, 255, 255, 0.5)",
+          "primary": "#fff",
+          "secondary": "rgba(255, 255, 255, 0.7)",
+        },
+        "tonalOffset": 0.2,
+        "type": "dark",
+        "warning": Object {
+          "contrastText": "rgba(0, 0, 0, 0.87)",
+          "dark": "#f57c00",
+          "light": "#ffb74d",
+          "main": "#ff9800",
+        },
+      },
+      "props": Object {},
+      "shadows": Array [
+        "none",
+        "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+        "0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)",
+        "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
+        "0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
+        "0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12)",
+        "0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12)",
+        "0px 4px 5px -2px rgba(0,0,0,0.2),0px 7px 10px 1px rgba(0,0,0,0.14),0px 2px 16px 1px rgba(0,0,0,0.12)",
+        "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+        "0px 5px 6px -3px rgba(0,0,0,0.2),0px 9px 12px 1px rgba(0,0,0,0.14),0px 3px 16px 2px rgba(0,0,0,0.12)",
+        "0px 6px 6px -3px rgba(0,0,0,0.2),0px 10px 14px 1px rgba(0,0,0,0.14),0px 4px 18px 3px rgba(0,0,0,0.12)",
+        "0px 6px 7px -4px rgba(0,0,0,0.2),0px 11px 15px 1px rgba(0,0,0,0.14),0px 4px 20px 3px rgba(0,0,0,0.12)",
+        "0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12)",
+        "0px 7px 8px -4px rgba(0,0,0,0.2),0px 13px 19px 2px rgba(0,0,0,0.14),0px 5px 24px 4px rgba(0,0,0,0.12)",
+        "0px 7px 9px -4px rgba(0,0,0,0.2),0px 14px 21px 2px rgba(0,0,0,0.14),0px 5px 26px 4px rgba(0,0,0,0.12)",
+        "0px 8px 9px -5px rgba(0,0,0,0.2),0px 15px 22px 2px rgba(0,0,0,0.14),0px 6px 28px 5px rgba(0,0,0,0.12)",
+        "0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12)",
+        "0px 8px 11px -5px rgba(0,0,0,0.2),0px 17px 26px 2px rgba(0,0,0,0.14),0px 6px 32px 5px rgba(0,0,0,0.12)",
+        "0px 9px 11px -5px rgba(0,0,0,0.2),0px 18px 28px 2px rgba(0,0,0,0.14),0px 7px 34px 6px rgba(0,0,0,0.12)",
+        "0px 9px 12px -6px rgba(0,0,0,0.2),0px 19px 29px 2px rgba(0,0,0,0.14),0px 7px 36px 6px rgba(0,0,0,0.12)",
+        "0px 10px 13px -6px rgba(0,0,0,0.2),0px 20px 31px 3px rgba(0,0,0,0.14),0px 8px 38px 7px rgba(0,0,0,0.12)",
+        "0px 10px 13px -6px rgba(0,0,0,0.2),0px 21px 33px 3px rgba(0,0,0,0.14),0px 8px 40px 7px rgba(0,0,0,0.12)",
+        "0px 10px 14px -6px rgba(0,0,0,0.2),0px 22px 35px 3px rgba(0,0,0,0.14),0px 8px 42px 7px rgba(0,0,0,0.12)",
+        "0px 11px 14px -7px rgba(0,0,0,0.2),0px 23px 36px 3px rgba(0,0,0,0.14),0px 9px 44px 8px rgba(0,0,0,0.12)",
+        "0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)",
+      ],
+      "shape": Object {
+        "borderRadius": 4,
+      },
+      "spacing": [Function],
+      "transitions": Object {
+        "create": [Function],
+        "duration": Object {
+          "complex": 375,
+          "enteringScreen": 225,
+          "leavingScreen": 195,
+          "short": 250,
+          "shorter": 200,
+          "shortest": 150,
+          "standard": 300,
+        },
+        "easing": Object {
+          "easeIn": "cubic-bezier(0.4, 0, 1, 1)",
+          "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "easeOut": "cubic-bezier(0.0, 0, 0.2, 1)",
+          "sharp": "cubic-bezier(0.4, 0, 0.6, 1)",
+        },
+        "getAutoHeightDuration": [Function],
+      },
+      "typography": Object {
+        "body1": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "1rem",
+          "fontWeight": 400,
+          "lineHeight": 1.5,
+        },
+        "body2": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "0.875rem",
+          "fontWeight": 400,
+          "lineHeight": 1.43,
+        },
+        "button": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "0.875rem",
+          "fontWeight": 500,
+          "lineHeight": 1.75,
+          "textTransform": "uppercase",
+        },
+        "caption": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "0.75rem",
+          "fontWeight": 400,
+          "lineHeight": 1.66,
+        },
+        "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+        "fontSize": 14,
+        "fontWeightBold": 700,
+        "fontWeightLight": 300,
+        "fontWeightMedium": 500,
+        "fontWeightRegular": 400,
+        "h1": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "6rem",
+          "fontWeight": 300,
+          "lineHeight": 1.167,
+        },
+        "h2": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "3.75rem",
+          "fontWeight": 300,
+          "lineHeight": 1.2,
+        },
+        "h3": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "3rem",
+          "fontWeight": 400,
+          "lineHeight": 1.167,
+        },
+        "h4": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "2.125rem",
+          "fontWeight": 400,
+          "lineHeight": 1.235,
+        },
+        "h5": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "1.5rem",
+          "fontWeight": 400,
+          "lineHeight": 1.334,
+        },
+        "h6": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "1.25rem",
+          "fontWeight": 500,
+          "lineHeight": 1.6,
+        },
+        "htmlFontSize": 16,
+        "overline": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "0.75rem",
+          "fontWeight": 400,
+          "lineHeight": 2.66,
+          "textTransform": "uppercase",
+        },
+        "pxToRem": [Function],
+        "round": [Function],
+        "subtitle1": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "1rem",
+          "fontWeight": 400,
+          "lineHeight": 1.75,
+        },
+        "subtitle2": Object {
+          "fontFamily": "\\"Roboto\\", \\"Helvetica\\", \\"Arial\\", \\"sans-serifSegoe UI\\", \\"Oxygen\\",
+      \\"Ubuntu\\", \\"Cantarell\\", \\"Fira Sans\\", \\"Droid Sans\\", \\"Helvetica Neue\\"",
+          "fontSize": "0.875rem",
+          "fontWeight": 500,
+          "lineHeight": 1.57,
+        },
+      },
+      "zIndex": Object {
+        "appBar": 1100,
+        "drawer": 1200,
+        "mobileStepper": 1000,
+        "modal": 1300,
+        "snackbar": 1400,
+        "speedDial": 1050,
+        "tooltip": 1500,
+      },
+    }
+  }
+>
+  <div
+    className="App"
+    data-testid="App"
+  >
+    <WithStyles(ForwardRef(Paper))>
+      <TopAppBar
+        address={null}
+        darkmode={true}
+        onChange={[Function]}
+      />
+      <br />
+      <header>
+        <WithStyles(ForwardRef(Typography))
+          align="center"
+          variant="h3"
+        >
+          Uniswap Remote Trader
+        </WithStyles(ForwardRef(Typography))>
+      </header>
+      <br />
+      <WithStyles(ForwardRef(Container))>
+        <WithStyles(ForwardRef(Grid))
+          alignItems="center"
+          container={true}
+          direction="column"
+          spacing={2}
+        >
+          <WithStyles(ForwardRef(Grid))
+            item={true}
+          >
+            <WithStyles(ForwardRef(Paper))
+              className="makeStyles-paper-1"
+              elevation={3}
+              style={
+                Object {
+                  "height": 400,
+                  "width": 550,
+                }
+              }
+            >
+              <Styled(MuiBox)
+                m={1}
+                p={1}
+              >
+                <WithStyles(ForwardRef(Grid))
+                  alignItems="center"
+                  container={true}
+                  direction="column"
+                  justify="center"
+                  spacing={2}
+                >
+                  <WithStyles(ForwardRef(Grid))
+                    alignItems="center"
+                    container={true}
+                    direction="row"
+                    item={true}
+                    justify="flex-end"
+                    spacing={2}
+                  >
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      Balance:
+                    </WithStyles(ForwardRef(Grid))>
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <BalanceButton
+                        selectToken1=""
+                        setInputToken1={[Function]}
+                        setInputToken2={[Function]}
+                        wallet={Object {}}
+                      />
+                    </WithStyles(ForwardRef(Grid))>
+                  </WithStyles(ForwardRef(Grid))>
+                  <WithStyles(ForwardRef(Grid))
+                    container={true}
+                    direction="row"
+                    item={true}
+                    justify="center"
+                    spacing={2}
+                  >
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        helperText="From"
+                        id="Select1"
+                        label="Token"
+                        onChange={[Function]}
+                        select={true}
+                        style={
+                          Object {
+                            "width": 230,
+                          }
+                        }
+                        value=""
+                        variant="outlined"
+                      >
+                        <WithStyles(ForwardRef(MenuItem))
+                          key="0xc778417e063141139fce010982780140aa0cd5ab"
+                          value="WETH"
+                        >
+                          WETH
+                        </WithStyles(ForwardRef(MenuItem))>
+                      </WithStyles(ForwardRef(TextField))>
+                    </WithStyles(ForwardRef(Grid))>
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        color="primary"
+                        disabled={true}
+                        error={false}
+                        id="Input1"
+                        label="Amount"
+                        onChange={[Function]}
+                        placeholder="0.0"
+                        style={
+                          Object {
+                            "width": 230,
+                          }
+                        }
+                        type="number"
+                        value=""
+                        variant="outlined"
+                      />
+                    </WithStyles(ForwardRef(Grid))>
+                  </WithStyles(ForwardRef(Grid))>
+                  <WithStyles(ForwardRef(Grid))
+                    container={true}
+                    direction="row"
+                    item={true}
+                    justify="center"
+                    spacing={2}
+                  >
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        helperText="To"
+                        id="Select2"
+                        label="Token"
+                        onChange={[Function]}
+                        select={true}
+                        style={
+                          Object {
+                            "width": 230,
+                          }
+                        }
+                        value=""
+                        variant="outlined"
+                      >
+                        <WithStyles(ForwardRef(MenuItem))
+                          key="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
+                          value="UNI"
+                        >
+                          UNI
+                        </WithStyles(ForwardRef(MenuItem))>
+                        <WithStyles(ForwardRef(MenuItem))
+                          key="0xc7ad46e0b8a400bb3c915120d284aafba8fc4735"
+                          value="DAI"
+                        >
+                          DAI
+                        </WithStyles(ForwardRef(MenuItem))>
+                      </WithStyles(ForwardRef(TextField))>
+                    </WithStyles(ForwardRef(Grid))>
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        color="primary"
+                        disabled={true}
+                        id="Input2"
+                        label="Estimated Price"
+                        placeholder="0.0"
+                        style={
+                          Object {
+                            "width": 230,
+                          }
+                        }
+                        type="number"
+                        value=""
+                        variant="outlined"
+                      />
+                    </WithStyles(ForwardRef(Grid))>
+                  </WithStyles(ForwardRef(Grid))>
+                </WithStyles(ForwardRef(Grid))>
+                <WithStyles(ForwardRef(Grid))
+                  alignItems="center"
+                  container={true}
+                  direction="column"
+                  spacing={2}
+                >
+                  <WithStyles(ForwardRef(Grid))
+                    item={true}
+                  >
+                    <WithStyles(ForwardRef(Typography))
+                      gutterBottom={true}
+                      id="discrete-slider-small-steps"
+                    >
+                      Slippage Tolerance
+                    </WithStyles(ForwardRef(Typography))>
+                    <WithStyles(ForwardRef(Slider))
+                      aria-labelledby="discrete-slider-small-steps"
+                      defaultValue={0.5}
+                      marks={true}
+                      max={1}
+                      min={0}
+                      onChangeCommitted={[Function]}
+                      step={0.1}
+                      valueLabelDisplay="auto"
+                    />
+                  </WithStyles(ForwardRef(Grid))>
+                  <WithStyles(ForwardRef(Grid))
+                    container={true}
+                    direction="row"
+                    item={true}
+                    justify="center"
+                    spacing={5}
+                  >
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        color="primary"
+                        error={false}
+                        helperText="Gas Price"
+                        id="Gas Price"
+                        label=""
+                        onChange={[Function]}
+                        placeholder="20"
+                        size="small"
+                        style={
+                          Object {
+                            "width": 60,
+                          }
+                        }
+                        type="number"
+                        value="20"
+                        variant="standard"
+                      />
+                      GWei
+                    </WithStyles(ForwardRef(Grid))>
+                    <WithStyles(ForwardRef(Grid))
+                      item={true}
+                    >
+                      <WithStyles(ForwardRef(TextField))
+                        color="primary"
+                        error={false}
+                        helperText="Deadline"
+                        id="Deadline"
+                        label=""
+                        onChange={[Function]}
+                        placeholder="20"
+                        size="small"
+                        style={
+                          Object {
+                            "width": 50,
+                          }
+                        }
+                        type="number"
+                        value="20"
+                        variant="standard"
+                      />
+                      min
+                    </WithStyles(ForwardRef(Grid))>
+                  </WithStyles(ForwardRef(Grid))>
+                </WithStyles(ForwardRef(Grid))>
+              </Styled(MuiBox)>
+            </WithStyles(ForwardRef(Paper))>
+          </WithStyles(ForwardRef(Grid))>
+          <WithStyles(ForwardRef(Grid))
+            item={true}
+          />
+          <WithStyles(ForwardRef(Grid))
+            item={true}
+          >
+            <WithStyles(ForwardRef(ButtonGroup))
+              color="primary"
+              disableElevation={true}
+              variant="contained"
+            >
+              <WithStyles(ForwardRef(Button))
+                color="primary"
+                disabled={true}
+                onClick={[Function]}
+                size="large"
+                variant="contained"
+              >
+                Estimate
+              </WithStyles(ForwardRef(Button))>
+              <WithStyles(ForwardRef(Button))
+                color="primary"
+                disabled={true}
+                onClick={[Function]}
+                size="large"
+                variant="contained"
+              >
+                Swap
+              </WithStyles(ForwardRef(Button))>
+            </WithStyles(ForwardRef(ButtonGroup))>
+          </WithStyles(ForwardRef(Grid))>
+        </WithStyles(ForwardRef(Grid))>
+        <br />
+        <Tokentable
+          coindata={Array []}
+        />
+      </WithStyles(ForwardRef(Container))>
+      <br />
+      <div>
+        <WithStyles(ForwardRef(Typography))
+          align="center"
+          variant="body2"
+        >
+          © 2021 Sajan Rajdev. All Rights Reserved.
+        </WithStyles(ForwardRef(Typography))>
+      </div>
+      <br />
+    </WithStyles(ForwardRef(Paper))>
+  </div>
+</ThemeProvider>
+`;
