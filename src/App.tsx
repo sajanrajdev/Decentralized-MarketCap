@@ -9,7 +9,6 @@ import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@m
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
-import Notify from 'bnc-notify'
 import { initOnboard, initNotify } from './Services/Blocknative'
 import { API } from "bnc-onboard/dist/src/interfaces";
 import { RinkebyTokens } from './Data/RinkbeyTokens'
@@ -34,11 +33,12 @@ let ethereum = window.ethereum;
 
 const styles = {
   paper: {
-    borderRadius: 3,
+    borderRadius: 26,
+    background: '#181a1c',
     border: 0,
     height: 48,
     padding: '0 30px',
-    boxShadow: '0 5px 5px 5px rgba(244, 21, 125, .3)',
+    square: false
   },
 };
 const useStyles = makeStyles(styles);
@@ -75,20 +75,30 @@ function App() {
   const WEI_TO_GWEI = 1000000000;
 
   const mainTheme = createMuiTheme({
-    palette:{
-      type: darkmode ? "dark" : "light",
-      primary: {
-        main: '#F4157D',
+    palette: {
+      type: darkmode ? 'dark' : 'light',
+      primary: { main: darkmode ? '#2172E5' : '#F4157D' },
+      secondary: {main: darkmode ? "#181a1c" : '#8f0b49' },
+      background: {
+        paper: darkmode ? '#282a2e' : "#edd5e0",
       },
-      secondary: {
-        main: '#8f0b49'
-      }
     },
     typography: {
-      "fontFamily": `"Roboto", "Helvetica", "Arial", "sans-serifSegoe UI", "Oxygen",
-      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue"`
-    }
+      fontFamily: "'Helvetica'",
+    },
   });
+
+  const styles = {
+    paper: {
+      borderRadius: 26,
+      background: darkmode ? '#181a1c' : "white",
+      border: 0,
+      height: 48,
+      padding: '0 30px',
+      square: false
+    },
+  };
+  const useStyles = makeStyles(styles);
 
   const classes = useStyles();
 
@@ -389,18 +399,22 @@ function App() {
           {loading && <CircularProgress />} 
         </Grid>
         <Grid item>   
-        <ButtonGroup disableElevation variant="contained" color="primary">
-          <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')||(parseFloat(inputToken1)<=0)} onClick={handleEstimatePriceButton}>
-            Estimate
-          </Button>
-          <Button variant="contained" size="large" color="primary" disabled={!isReadyToSwap()} onClick={performTrade}>
-            Swap
-          </Button>
-        </ButtonGroup>
-        </Grid> 
+          <ButtonGroup disableElevation variant="contained" color="primary">
+            <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')||(parseFloat(inputToken1)<=0)} onClick={handleEstimatePriceButton}>
+              Estimate
+            </Button>
+            <Button variant="contained" size="large" color="primary" disabled={!isReadyToSwap()} onClick={performTrade}>
+              Swap
+            </Button>
+          </ButtonGroup>
+        </Grid>
+        <Grid item>   
+          <br/>
+          <Paper className={classes.paper} style={{ height: 1205, width: 550, padding: '10px'}}>
+            <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
+          </Paper>
+        </Grid>
       </Grid>
-      <br/>
-        <Tokentable coindata={sortTokenList(maintokenslist, etherPrice)}/>
       </Container>
       <br/>
       <div >
