@@ -328,19 +328,19 @@ function App() {
                 </Grid>
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
-                    <TextField data-testid="Select1" select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
+                    <TextField inputProps={{ "data-testid": "Select1" }} select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
                         <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
                           {tokenslist[0].symbol} 
                         </MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item>
-                    <TextField data-testid="Input1" label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number" error={parseFloat(inputToken1)<=0}/>
+                    <TextField inputProps={{ "data-testid": "Input1" }} label="Amount" placeholder="0.0" variant="outlined" value={inputToken1} style = {{width: 230}} color="primary" onChange={handleInputChange1} disabled={(selectToken1=='')||(selectToken2=='')} type="number" error={parseFloat(inputToken1)<=0}/>
                   </Grid>
                 </Grid> 
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
-                    <TextField data-testid="Select2" select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
+                    <TextField inputProps={{ "data-testid": "Select2" }} select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
                       {tokenslist.slice(1, tokenslist.length).map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}
@@ -349,7 +349,7 @@ function App() {
                     </TextField>
                   </Grid>
                   <Grid item>
-                    <TextField id="Input2" label="Estimated Price" placeholder="0.0" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
+                    <TextField inputProps={{ "data-testid": "Input2" }} label="Estimated Price" placeholder="0.0" variant="outlined" value={inputToken2} style = {{width: 230}} color="primary" disabled type="number"/>
                   </Grid>
                 </Grid>
               </Grid>
@@ -388,10 +388,10 @@ function App() {
         </Grid>
         <Grid item>   
           <ButtonGroup disableElevation variant="contained" color="primary">
-            <Button variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')||(parseFloat(inputToken1)<=0)} onClick={handleEstimatePriceButton}>
+            <Button name='Estimate' variant="contained" size="large" color="primary" disabled={(inputToken1=='')||(selectToken2=='')||(parseFloat(inputToken1)<=0)} onClick={handleEstimatePriceButton}>
               Estimate
             </Button>
-            <Button variant="contained" size="large" color="primary" disabled={!isReadyToSwap()} onClick={performTrade}>
+            <Button name='Swap' variant="contained" size="large" color="primary" disabled={!isReadyToSwap()} onClick={performTrade}>
               Swap
             </Button>
           </ButtonGroup>

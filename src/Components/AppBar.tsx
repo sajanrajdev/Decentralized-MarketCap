@@ -54,13 +54,15 @@ export default function TopAppBar({address, onboard, network, onChange, darkmode
           <Typography variant="button" className={classes.title}> 
           </Typography>
           <Grid container spacing={1} direction={'row'} alignItems={'center'} justify={'flex-end'}>
-            <Grid item><Button color="secondary" variant="outlined" style={{ border: '2px solid' }}><b>{networkName(network)}</b></Button></Grid>
+            <Grid item>{address && <Button color="secondary" variant="outlined" style={{ border: '2px solid' }}><b>{networkName(network)}</b></Button>}</Grid>
             <Grid item>{address && <Button color="secondary" variant="outlined" style={{ border: '2px solid' }}><b>{truncateAddress(address)}</b></Button>}</Grid>
-            <Grid item><Button color="secondary" variant="contained" onClick={ async () => {
+            <Grid item><Button name='Connect' color="secondary" variant="contained" onClick={ async () => {
               if(buttonstatus == 'Connect Wallet'){
-                setButtonStatus('Disconnect Wallet');
                 await onboard.walletSelect()
                 await onboard.walletCheck()
+                if(window.ethereum){
+                  setButtonStatus('Disconnect Wallet');  
+                }
               }
               else{
                 setButtonStatus('Connect Wallet');
