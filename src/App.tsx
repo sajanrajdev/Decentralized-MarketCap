@@ -13,6 +13,7 @@ import { initOnboard, initNotify } from './Services/Blocknative'
 import { API } from "bnc-onboard/dist/src/interfaces";
 import { RinkebyTokens } from './Data/RinkbeyTokens'
 import BalanceButton from './Components/BalanceButton'
+import BigNumber from 'bignumber.js'
 
 
 interface TradeToken {
@@ -155,9 +156,9 @@ function App() {
         const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, tradeprovider);
         const route = new Route([pair], tradetoken1);
         const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
-  /*       console.log("Execution Price:", trade.executionPrice.toSignificant(6));
+        console.log("Execution Price:", trade.executionPrice.toSignificant(6));
         console.log("Mid Price:", route.midPrice.toSignificant(6));
-        console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6)); */
+        console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6));
         setCurrentTrade(trade);
         setLoading(false);
         return trade.executionPrice.toSignificant(6);
@@ -176,9 +177,19 @@ function App() {
         const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
         const value = toHex(currentTrade.inputAmount.raw);
         const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
-        const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
-  
-        const tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value, gasPrice: parseInt(gasprice)*WEI_TO_GWEI});
+
+        var uniswap;
+        var tx;
+
+        if(token1.symbol == 'WETH' || token1.symbol == 'ETH'){
+          uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
+          tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value});
+        }
+        else{
+          uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
+          tx = await uniswap.swapExactTokensForTokens(value, amountOutMin, path, to, tradedeadline);
+        }
+        
         console.log('Transaction Hash:',tx.hash);
   
         if (notify != undefined){
@@ -202,7 +213,65 @@ function App() {
       else{
         console.log("Current Trade not defined")
       }
+    }  
+
+/*     const getPrice = async () => {
+      if(walletnetwork == NETWORK_ID){
+        setLoading(true);
+        const tradeprovider = new ethers.providers.InfuraWebSocketProvider(networkName(walletnetwork), {infura: 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'})
+        const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress('0xc778417e063141139fce010982780140aa0cd5ab'), tradeprovider);  // UNI
+        const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress('0xc7ad46e0b8a400bb3c915120d284aafba8fc4735'), tradeprovider); // DAI
+        const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, tradeprovider);
+        const route = new Route([pair], tradetoken1);
+        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
+        console.log("Execution Price:", trade.executionPrice.toSignificant(6));
+        console.log("Mid Price:", route.midPrice.toSignificant(6));
+        console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6));
+        setCurrentTrade(trade);
+        setLoading(false);
+        return trade.executionPrice.toSignificant(6);
+      }
+      else{
+        console.log("Please switch to Rinkeby network");
+      }
     }
+  
+    const performTrade = async () => {
+      if(currentTrade != undefined && readyToTransact()){
+        const slippageTolerance = new Percent((tolerance*100).toString(), '10000');
+        const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
+        const path = [ethers.utils.getAddress('0xc778417e063141139fce010982780140aa0cd5ab'), ethers.utils.getAddress('0xc7ad46e0b8a400bb3c915120d284aafba8fc4735')];
+        const to = address; // Sends to selected address on wallet
+        const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
+        const value = toHex(currentTrade.inputAmount.raw);
+        const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
+        const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
+  
+        const tx = await uniswap.swapExactTokensForTokens(value, amountOutMin, path, to, tradedeadline);
+        console.log('Transaction Hash:',tx.hash);
+  
+        if (notify != undefined){
+          const { emitter } = notify.hash(tx.hash);
+          emitter.on('txPool', (tx: any) => {
+            return {
+              onclick: () =>
+                window.open(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
+            }
+          });
+          emitter.on('txSent', console.log);
+          emitter.on('txConfirmed', console.log);
+          emitter.on('txSpeedUp', console.log);
+          emitter.on('txCancel', console.log);
+          emitter.on('txFailed', console.log);
+        }
+  
+        const receipt = await tx.wait();
+        console.log("Transaction was mined in block:", receipt.blockNumber);
+      }
+      else{
+        console.log("Current Trade not defined")
+      }
+    }  */
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -291,7 +360,7 @@ function App() {
   }
 
   const isReadyToSwap = () => {
-    if((selectToken1!="WETH")||(inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)||(balance==undefined)||(parseFloat(inputToken1)>parseFloat(balance)/1000000000000000000)){
+    if((inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)||(balance==undefined)||(parseFloat(inputToken1)>parseFloat(balance)/1000000000000000000)){
       return false;
     }
     else {
@@ -329,9 +398,11 @@ function App() {
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
                     <TextField inputProps={{ "data-testid": "Select1" }} select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
-                        <MenuItem key={tokenslist[0].id} value={tokenslist[0].symbol}> 
-                          {tokenslist[0].symbol} 
+                      {tokenslist.map((option: any | any[]) => (
+                        <MenuItem key={option.id} value={option.symbol}>
+                          {option.symbol}
                         </MenuItem>
+                      ))}
                     </TextField>
                   </Grid>
                   <Grid item>
@@ -341,7 +412,7 @@ function App() {
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
                     <TextField inputProps={{ "data-testid": "Select2" }} select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
-                      {tokenslist.slice(1, tokenslist.length).map((option: any | any[]) => (
+                      {tokenslist.map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}
                         </MenuItem>
