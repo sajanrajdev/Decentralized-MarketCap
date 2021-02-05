@@ -4,8 +4,8 @@ import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap
 import Tokentable from './Components/Tokentable';
 import TopAppBar from './Components/AppBar'
 import { ETHER_PRICE, ALL_TOKENS } from './Data/queries'
-import { sortTokenList, getTokenBySymbol, toHex, networkName } from './utils';
-import { Container, TextField, MenuItem, Button, ButtonGroup, Divider } from '@material-ui/core';
+import { sortTokenList, getTokenBySymbol, toHex, spliceNoMutate, getERC20TokenBalance } from './utils';
+import { Container, TextField, MenuItem, Button, ButtonGroup } from '@material-ui/core';
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
 import {ethers} from 'ethers'
@@ -51,9 +51,9 @@ function App() {
   const [darkmode, setDarkMode] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [address, setAddress] = useState(null);
+  const [address, setAddress] = useState<string>();
   const [walletnetwork, setWalletNetwork] = useState<number>();
-  const [balance, setBalance] = useState<string>();
+  const [balance, setBalance] = useState<any>();
   const [wallet, setWallet] = useState({});
 
   const [onboard, setOnboard] = useState<API>()
@@ -61,7 +61,6 @@ function App() {
 
   const NETWORK_ID = 4; // Working network, to be selectable in the future (Mainnet 1, Ropsten 3 and Rinkeby 4)
   const WEI_TO_ETH = 1000000000000000000;
-  const WEI_TO_GWEI = 1000000000;
 
   const mainTheme = createMuiTheme({
     palette: {
@@ -96,7 +95,6 @@ function App() {
     const onboard = initOnboard({
       address: setAddress,
       network: setWalletNetwork,
-      balance: setBalance,
       wallet: (wallet: any) => {
         if (wallet.provider) {
           setWallet(wallet)
@@ -133,6 +131,22 @@ function App() {
     }
   }, [onboard]);
 
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if(provider && address!=null){
+        if(token1.symbol == 'WETH'){
+          let ETHBalance = await provider.getBalance(address);
+          setBalance(ethers.utils.formatEther(ETHBalance))
+        }
+        else{
+          let ERC20Balance = await getERC20TokenBalance(token1, address, provider);
+          setBalance(ERC20Balance);
+        }
+      }
+    };
+    fetchBalance();
+  }, [token1]);
+
   // Verifies if wallet has already been selected and checks up
   const readyToTransact = async () => {
     if(onboard){
@@ -150,12 +164,11 @@ function App() {
     const getPrice = async () => {
       if(walletnetwork == NETWORK_ID){
         setLoading(true);
-        const tradeprovider = new ethers.providers.InfuraWebSocketProvider(networkName(walletnetwork), {infura: 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'})
-        const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token1.address), tradeprovider); 
-        const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address), tradeprovider);
-        const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, tradeprovider);
+        const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token1.address), provider); 
+        const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address), provider);
+        const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, provider);
         const route = new Route([pair], tradetoken1);
-        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
+        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*(10**token1.decimals)).toString()), TradeType.EXACT_INPUT);
         console.log("Execution Price:", trade.executionPrice.toSignificant(6));
         console.log("Mid Price:", route.midPrice.toSignificant(6));
         console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6));
@@ -176,7 +189,7 @@ function App() {
         const to = address; // Sends to selected address on wallet
         const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
         const value = toHex(currentTrade.inputAmount.raw);
-        const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
+        const signer = provider.getSigner();
 
         var uniswap;
         var tx;
@@ -214,64 +227,6 @@ function App() {
         console.log("Current Trade not defined")
       }
     }  
-
-/*     const getPrice = async () => {
-      if(walletnetwork == NETWORK_ID){
-        setLoading(true);
-        const tradeprovider = new ethers.providers.InfuraWebSocketProvider(networkName(walletnetwork), {infura: 'https://rinkeby.infura.io/v3/d7da0df84bee438db5954b908cfbdf2e'})
-        const tradetoken1 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress('0xc778417e063141139fce010982780140aa0cd5ab'), tradeprovider);  // UNI
-        const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress('0xc7ad46e0b8a400bb3c915120d284aafba8fc4735'), tradeprovider); // DAI
-        const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, tradeprovider);
-        const route = new Route([pair], tradetoken1);
-        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*WEI_TO_ETH).toString()), TradeType.EXACT_INPUT);
-        console.log("Execution Price:", trade.executionPrice.toSignificant(6));
-        console.log("Mid Price:", route.midPrice.toSignificant(6));
-        console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6));
-        setCurrentTrade(trade);
-        setLoading(false);
-        return trade.executionPrice.toSignificant(6);
-      }
-      else{
-        console.log("Please switch to Rinkeby network");
-      }
-    }
-  
-    const performTrade = async () => {
-      if(currentTrade != undefined && readyToTransact()){
-        const slippageTolerance = new Percent((tolerance*100).toString(), '10000');
-        const amountOutMin = toHex(currentTrade.minimumAmountOut(slippageTolerance).raw);
-        const path = [ethers.utils.getAddress('0xc778417e063141139fce010982780140aa0cd5ab'), ethers.utils.getAddress('0xc7ad46e0b8a400bb3c915120d284aafba8fc4735')];
-        const to = address; // Sends to selected address on wallet
-        const tradedeadline = Math.floor(Date.now() / 1000) + 60 * parseInt(deadline); // Maximum wait time for transaction (20min)
-        const value = toHex(currentTrade.inputAmount.raw);
-        const signer = (new ethers.providers.Web3Provider(ethereum)).getSigner();
-        const uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
-  
-        const tx = await uniswap.swapExactTokensForTokens(value, amountOutMin, path, to, tradedeadline);
-        console.log('Transaction Hash:',tx.hash);
-  
-        if (notify != undefined){
-          const { emitter } = notify.hash(tx.hash);
-          emitter.on('txPool', (tx: any) => {
-            return {
-              onclick: () =>
-                window.open(`https://rinkeby.etherscan.io/tx/${tx.hash}`)
-            }
-          });
-          emitter.on('txSent', console.log);
-          emitter.on('txConfirmed', console.log);
-          emitter.on('txSpeedUp', console.log);
-          emitter.on('txCancel', console.log);
-          emitter.on('txFailed', console.log);
-        }
-  
-        const receipt = await tx.wait();
-        console.log("Transaction was mined in block:", receipt.blockNumber);
-      }
-      else{
-        console.log("Current Trade not defined")
-      }
-    }  */
 
   const client = new ApolloClient({
     uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
@@ -360,7 +315,7 @@ function App() {
   }
 
   const isReadyToSwap = () => {
-    if((inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)||(balance==undefined)||(parseFloat(inputToken1)>parseFloat(balance)/1000000000000000000)){
+    if((inputToken2=='')||(deadline=='')||(gasprice=='')||(walletnetwork==undefined)||(balance==undefined)||(parseFloat(inputToken1)>parseFloat(balance))){
       return false;
     }
     else {
@@ -368,7 +323,6 @@ function App() {
     }
   }  
   
-
   return (
     <ThemeProvider theme={mainTheme}>
     <div className="App" data-testid="App">
@@ -389,7 +343,7 @@ function App() {
               <Grid container spacing={2} direction={'column'} alignItems={'center'} justify={'center'}>
                 <Grid item container spacing={2} direction={'row'} alignItems={'center'} justify={'flex-end'}>
                   <Grid item>
-                    {balance ? `Balance: ${(parseFloat(balance)/1000000000000000000).toFixed(6).toString()} ETH` : 'Balance:'}
+                    {balance ? `Balance: ${(parseFloat(balance)).toFixed(6).toString()} ${token1.symbol}` : 'Balance:'}
                   </Grid> 
                   <Grid item>
                     <BalanceButton balance={balance} selectToken1={selectToken1} wallet={wallet} setInputToken1={setInputToken1} setInputToken2={setInputToken2}></BalanceButton>
@@ -398,7 +352,7 @@ function App() {
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
                     <TextField inputProps={{ "data-testid": "Select1" }} select label="Token" helperText="From" value={selectToken1} style = {{width: 230}} onChange={handleChange1} variant="outlined">
-                      {tokenslist.map((option: any | any[]) => (
+                      {(spliceNoMutate(tokenslist, selectToken2)).map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}
                         </MenuItem>
@@ -412,7 +366,7 @@ function App() {
                 <Grid item container spacing={2} direction={'row'} justify={'center'}>
                   <Grid item>
                     <TextField inputProps={{ "data-testid": "Select2" }} select label="Token" helperText="To" value={selectToken2} style = {{width: 230}} onChange={handleChange2} variant="outlined">
-                      {tokenslist.map((option: any | any[]) => (
+                      {(spliceNoMutate(tokenslist, selectToken1)).map((option: any | any[]) => (
                         <MenuItem key={option.id} value={option.symbol}>
                           {option.symbol}
                         </MenuItem>
@@ -441,10 +395,6 @@ function App() {
                   />
                 </Grid>
                 <Grid container item spacing={5} direction={'row'} justify={'center'}>
-                  <Grid item>
-                    <TextField id="Gas Price" label="" size="small" helperText="Gas Price" placeholder="20" variant="standard" onChange={handleInputGasPrice} value={gasprice} style = {{width: 60}} color="primary" type="number" error={(gasprice=='')||parseInt(gasprice)<=0}/>
-                    GWei
-                  </Grid>
                   <Grid item>
                     <TextField id="Deadline" label="" size="small" helperText="Deadline" placeholder="20" variant="standard" onChange={handleInputDeadline} value={deadline} style = {{width: 50}} color="primary" type="number" error={(deadline=='')||parseInt(deadline)<=0}/>
                     min

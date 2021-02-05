@@ -1,3 +1,5 @@
+  import {ethers} from 'ethers'  
+  
   // Function to capitalize a string
   const capitalize = (s: string) => {
     if (typeof s !== 'string') return ''
@@ -56,7 +58,7 @@
   // Function to return Token data based on a given symbol
   const getTokenBySymbol = (tokenslist: any[], selectedSymbol: string) => {
     var selectedToken = tokenslist.find(x => x.symbol === selectedSymbol)
-        console.log(selectedToken);
+        /* console.log(selectedToken); */
       return (selectedToken);
     }
 
@@ -78,6 +80,18 @@
     return `0x${amount.toString(16)}`
 }
 
+  // Function to return an array without a given entry
+  function spliceNoMutate(myArray: any | any[], tokenToRemove: any) {
+    if( tokenToRemove == '' ){
+      return myArray;
+    }
+    else{
+      var token = getTokenBySymbol(myArray, tokenToRemove)
+      var indexToRemove = myArray.indexOf(token)
+      return myArray.slice(0, indexToRemove).concat(myArray.slice(indexToRemove+1));
+    }
+  }
+
   // Function to return a network name 
   function networkName(id: number | string) {
     switch (Number(id)) {
@@ -96,23 +110,34 @@
     }
   }
 
-/*   const HandleCheckBox = () => {
-    if(selectedKeys){
-      var tokens: any[] | any = getTokensByID(tokenslist, selectedKeys);
-      if(selectedKeys.length == 1){
-        console.log(tokens[0].symbol)
-        setSelectToken1(tokens[0].symbol)
-      }
-      else if(selectedKeys.length == 2){
-        console.log(tokens[1].symbol)
-        setSelectToken2(tokens[1].symbol)
-      }
-      else if(selectedKeys.length >= 2){
-        console.log("Toom many selected")
-      }
-    }
-    return(null) 
-  } */
+  const getERC20TokenBalance = async (token: any, address: string, provider: any) => {
+    const contractAbiFragment = [
+      {
+        name: 'balanceOf',
+        type: 'function',
+        inputs: [
+          {
+            name: '_owner',
+            type: 'address',
+          },
+        ],
+        outputs: [
+          {
+            name: 'balance',
+            type: 'uint256',
+          },
+        ],
+        constant: true,
+        payable: false,
+      },
+    ];
+  
+    const contract = new ethers.Contract(token.address, contractAbiFragment, provider);
+  
+    const balance = await contract.balanceOf(address);
+  
+    return (parseFloat(balance)/(10**parseInt(token.decimals))).toString();
+  }
 
   export {percentageFormatter, 
     currencyFormatter, 
@@ -123,4 +148,6 @@
     getTokensByID, 
     toHex, 
     networkName, 
-    truncateAddress}
+    truncateAddress,
+    spliceNoMutate,
+    getERC20TokenBalance}

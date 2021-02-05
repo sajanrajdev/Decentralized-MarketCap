@@ -12,13 +12,13 @@ type Props = {
 export default function BalanceButton (props: Props) {
 
     const handleBalanceButton = () => {
-        if(props.balance != null && props.balance != undefined && props.selectToken1 == 'WETH') {
-            if((parseFloat(props.balance)/1000000000000000000) > 0.01){
-            props.setInputToken1(((parseFloat(props.balance)/1000000000000000000)-0.01).toString()) // Max input - 0.01 to account for gas usage
-            props.setInputToken2(''); // Reset input 2
+        if(props.balance != null && props.balance != undefined) {
+            if((parseFloat(props.balance)) > 0.01){
+              props.setInputToken1(((parseFloat(props.balance))-0.01).toString()) // Max input - 0.01 to account for gas usage
+              props.setInputToken2(''); // Reset input 2
             }
             else{
-            alert("Insufficient balance!")
+              alert("Insufficient balance!")
             }
         }
         }
