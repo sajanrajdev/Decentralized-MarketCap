@@ -1,5 +1,5 @@
 # Uniswap Remote Trader
-This application allows you to swap tokens leveraging Uniswap's smart contracts. For the moment, it is only enabled for the Rinkbey network and to swap WETH for UNI, DAI and MKR.
+This application allows you to swap tokens leveraging Uniswap's smart contracts. For the moment, it is only enabled for the Rinkbey network and to swap between WETH, UNI, DAI and MKR.
 
 The purpose of the development of this project was to test several tools and technologies related to the Ethereum Blockchain and its interaction to a Frontend application. The following technologies were utilized:
 - Uniswap SDK
@@ -22,7 +22,6 @@ Languages: Typescript, HTML and CSS
 - Input amount to swap (or use your wallet's balance)
 - Get estimated execution price
 - Select Slippage tolerance
-- Input Gas Price
 - Input Deadline in minutes
 - Perform transaction
 - Receive live notifications on transaction's state
