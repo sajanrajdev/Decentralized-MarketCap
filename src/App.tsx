@@ -156,7 +156,7 @@ function App() {
         const tradetoken2 = await Fetcher.fetchTokenData(walletnetwork, ethers.utils.getAddress(token2.address), provider);
         const pair = await Fetcher.fetchPairData(tradetoken1, tradetoken2, provider);
         const route = new Route([pair], tradetoken1);
-        const trade = new Trade(route, new TokenAmount(tradetoken1, (parseFloat(inputToken1)*(10**token1.decimals)).toString()), TradeType.EXACT_INPUT);
+        const trade = new Trade(route, new TokenAmount(tradetoken1, (BigInt((parseFloat(inputToken1))*(WEI_TO_ETH))).toString()), TradeType.EXACT_INPUT);
         console.log("Execution Price:", trade.executionPrice.toSignificant(6));
         console.log("Mid Price:", route.midPrice.toSignificant(6));
         console.log("Next Mid Price:", trade.nextMidPrice.toSignificant(6));
