@@ -4,7 +4,7 @@ import { Fetcher, Trade, Route, TokenAmount, TradeType, Percent } from '@uniswap
 import Tokentable from './Components/Tokentable';
 import TopAppBar from './Components/AppBar'
 import { ETHER_PRICE, ALL_TOKENS } from './Data/queries'
-import { sortTokenList, getTokenBySymbol, toHex, spliceNoMutate, getERC20TokenBalance } from './utils';
+import { sortTokenList, getTokenBySymbol, toHex, spliceNoMutate, getERC20TokenBalance, fetchBalance } from './utils';
 import { Container, TextField, MenuItem, Button, ButtonGroup } from '@material-ui/core';
 import { Paper, CircularProgress, Grid, Box, Slider, Typography } from '@material-ui/core';
 import { ThemeProvider, createMuiTheme, makeStyles } from '@material-ui/core/styles';
@@ -132,19 +132,7 @@ function App() {
   }, [onboard]);
 
   useEffect(() => {
-    const fetchBalance = async () => {
-      if(provider && address!=null){
-        if(token1.symbol == 'WETH'){
-          let ETHBalance = await provider.getBalance(address);
-          setBalance(ethers.utils.formatEther(ETHBalance))
-        }
-        else{
-          let ERC20Balance = await getERC20TokenBalance(token1, address, provider);
-          setBalance(ERC20Balance);
-        }
-      }
-    };
-    fetchBalance();
+    fetchBalance(provider, address, token1, setBalance);
   }, [token1]);
 
   // Verifies if wallet has already been selected and checks up
@@ -198,6 +186,10 @@ function App() {
           uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
           tx = await uniswap.swapExactETHForTokens(amountOutMin, path, to, tradedeadline, {value});
         }
+        else if(token2.symbol == 'WETH' || token2.symbol == 'ETH'){
+          uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)'], signer);
+          tx = await uniswap.swapExactTokensForETH(value, amountOutMin, path, to, tradedeadline);
+        }
         else{
           uniswap = new ethers.Contract(ethers.utils.getAddress('0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'), ['function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)'], signer);
           tx = await uniswap.swapExactTokensForTokens(value, amountOutMin, path, to, tradedeadline);
@@ -222,6 +214,7 @@ function App() {
   
         const receipt = await tx.wait();
         console.log("Transaction was mined in block:", receipt.blockNumber);
+        fetchBalance(provider, address, token1, setBalance); // Sets new balane for Token1 after transaction
       }
       else{
         console.log("Current Trade not defined")
