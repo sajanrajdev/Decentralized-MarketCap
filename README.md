@@ -14,7 +14,7 @@ The purpose of the development of this project was to test several tools and tec
 - Create-React-App
 - Parcel
 
-Languages: Typescript, HTML and CSS
+Languages: Typescript and HTML
 
 ## Features
 - Connect your wallet
